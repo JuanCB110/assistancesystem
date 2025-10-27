@@ -1,0 +1,150 @@
+<div class="control-asistencia-container">
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>Control de Asistencia</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <!-- Selector de Fecha -->
+      <div class="date-selector">
+        <mat-form-field appearance="outline">
+          <mat-label>Seleccionar fecha</mat-label>
+          <input 
+            matInput 
+            type="date" 
+            [(ngModel)]="selectedDate"
+            [max]="getToday()"
+            (change)="onDateChange()"
+          />
+        </mat-form-field>
+        <button mat-raised-button color="primary" (click)="handleHoyClick()">
+          <mat-icon>today</mat-icon>
+          HOY
+        </button>
+      </div>
+
+      <!-- Filtros de Ubicación -->
+      <div class="filtros">
+        <mat-form-field appearance="outline">
+          <mat-label>Edificio</mat-label>
+          <mat-select [(ngModel)]="selectedEdificio" (selectionChange)="onEdificioChange()">
+            <mat-option [value]="null">Todos los edificios</mat-option>
+            <mat-option *ngFor="let edificio of edificios" [value]="edificio.id">
+              {{ edificio.nombre }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Aula</mat-label>
+          <mat-select 
+            [(ngModel)]="selectedAula" 
+            (selectionChange)="onAulaChange()"
+            [disabled]="!selectedEdificio"
+          >
+            <mat-option value="">Todas las aulas</mat-option>
+            <mat-option *ngFor="let aula of aulas" [value]="aula.numero">
+              {{ aula.numero }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <!-- Tabla de Horarios -->
+  <mat-card *ngIf="!loading && diaActual && horasNecesarias.length > 0" class="table-card">
+    <table mat-table [dataSource]="getHorarioArray()" class="horario-table">
+      <!-- Columna Hora -->
+      <ng-container matColumnDef="hora">
+        <th mat-header-cell *matHeaderCellDef class="header-hora">Hora</th>
+        <td mat-cell *matCellDef="let horario" class="cell-hora">
+          {{ horario.hora_inicio }} - {{horario.hora_fin}}
+        </td>
+      </ng-container>
+
+      <!-- Columna Día Actual -->
+      <ng-container matColumnDef="dia">
+        <th mat-header-cell *matHeaderCellDef class="header-dia">{{ diaActual }}</th>
+        <td mat-cell *matCellDef="let horario" class="cell-dia" [class.has-class]="horario.materia">
+          <div class="horario-info">
+            <div class="materia-nombre">{{ horario.materia }}</div>
+            <div class="maestro-info">Maestro: {{ horario.maestro }}</div>
+            <div class="grupo-info">Grupo: {{ horario.grupo }}</div>
+            <div *ngIf="horario.aula" class="ubicacion-info">
+              Aula: {{ horario.aula }}
+            </div>
+            <div class="estado-info" [ngClass]="{
+              'estado-presente': horario.asistencia === 'Presente',
+              'estado-ausente': horario.asistencia === 'Falta',
+              'estado-retardo': horario.asistencia === 'Retardo',
+              'estado-pendiente': horario.asistencia === 'pendiente'
+            }">
+              Estado: {{ horario.asistencia }}
+            </div>
+            <div class="botones-asistencia">
+              <button 
+                mat-raised-button 
+                [color]="horario.asistencia === 'Presente' ? 'primary' : ''"
+                [class.selected]="horario.asistencia === 'Presente'"
+                (click)="handleToggleAsistencia(horario.dia, horario.hora_inicio, 'Presente')"
+                class="btn-presente"
+              >
+                <mat-icon>check_circle</mat-icon>
+                Presente
+              </button>
+              <button 
+                mat-raised-button 
+                [color]="horario.asistencia === 'Falta' ? 'warn' : ''"
+                [class.selected]="horario.asistencia === 'Falta'"
+                (click)="handleToggleAsistencia(horario.dia, horario.hora_inicio, 'Falta')"
+                class="btn-ausente"
+              >
+                <mat-icon>cancel</mat-icon>
+                Falta
+              </button>
+              <button 
+                mat-raised-button 
+                [color]="horario.asistencia === 'Retardo' ? 'accent' : ''"
+                [class.selected]="horario.asistencia === 'Retardo'"
+                (click)="handleToggleAsistencia(horario.dia, horario.hora_inicio, 'Retardo')"
+                class="btn-retardo"
+              >
+                <mat-icon>schedule</mat-icon>
+                Retardo
+              </button>
+            </div>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="['hora', 'dia']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['hora', 'dia'];"></tr>
+    </table>
+  </mat-card>
+
+  <!-- Mensaje sin horarios -->
+  <mat-card *ngIf="!loading && !diaActual" class="empty-state">
+    <mat-card-content>
+      <mat-icon>event_busy</mat-icon>
+      <p>No hay clases disponibles para mostrar.</p>
+      <p style="font-size: 0.875rem; color: #9ca3af;">Seleccione un día entre semana (Lunes a Viernes)</p>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Mensaje cuando no hay horarios para el día seleccionado -->
+  <mat-card *ngIf="!loading && diaActual && horasNecesarias.length === 0" class="empty-state">
+    <mat-card-content>
+      <mat-icon>schedule</mat-icon>
+      <p>No se encontraron horarios para {{ diaActual }}</p>
+      <p style="font-size: 0.875rem; color: #9ca3af;">
+        Verifique que existan horarios registrados en la base de datos para este día.
+        <br>Revise la consola del navegador (F12) para más detalles de depuración.
+      </p>
+    </mat-card-content>
+  </mat-card>
+</div>

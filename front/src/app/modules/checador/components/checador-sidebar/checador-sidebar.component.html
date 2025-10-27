@@ -1,0 +1,23 @@
+<div class="sidebar">
+  <div class="user-info">
+    <mat-icon class="user-icon">account_circle</mat-icon>
+    <h3>{{ userName }}</h3>
+    <p class="user-role">Checador</p>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <mat-nav-list class="nav-list">
+    <mat-list-item (click)="navigateTo('/checador/control-asistencia')" class="nav-item">
+      <mat-icon matListItemIcon>event_available</mat-icon>
+      <span matListItemTitle>Control de Asistencia</span>
+    </mat-list-item>
+
+    <mat-divider></mat-divider>
+
+    <mat-list-item (click)="logout()" class="nav-item logout">
+      <mat-icon matListItemIcon>exit_to_app</mat-icon>
+      <span matListItemTitle>Cerrar Sesión</span>
+    </mat-list-item>
+  </mat-nav-list>
+</div>

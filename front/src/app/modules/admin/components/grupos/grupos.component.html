@@ -1,0 +1,111 @@
+<div class="grupos-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>Gestión de Grupos</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Nombre del Grupo</mat-label>
+          <input matInput [(ngModel)]="newGroup" name="newGroup">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Carrera</mat-label>
+          <mat-select [(value)]="selectedCarrera">
+            <mat-option *ngFor="let carrera of carreras" [value]="carrera.id">
+              {{carrera.nombre}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Jefe de Grupo</mat-label>
+          <mat-select [(value)]="selectedJefe">
+            <mat-option *ngFor="let jefe of jefes" [value]="jefe.id">
+              {{jefe.name}} - {{jefe.numero_cuenta}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Aula</mat-label>
+          <mat-select [(value)]="selectedAula">
+            <mat-option *ngFor="let aula of aulas" [value]="aula.id">
+              {{aula.numero}} - {{getEdificioNombreByAula(aula.edificio_id)}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="button-section">
+        <button mat-raised-button color="primary" 
+                (click)="crearGrupo()" 
+                [disabled]="loading">
+          <mat-icon *ngIf="!loading">group_add</mat-icon>
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          <span *ngIf="!loading">Crear Grupo</span>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-card-title>Grupos Existentes</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="grupos" class="grupos-table">
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef>Nombre</th>
+            <td mat-cell *matCellDef="let grupo">{{grupo.name}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="carrera">
+            <th mat-header-cell *matHeaderCellDef>Carrera</th>
+            <td mat-cell *matCellDef="let grupo">{{getCarreraNombre(grupo.carrera_id)}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="jefe">
+            <th mat-header-cell *matHeaderCellDef>Jefe de Grupo</th>
+            <td mat-cell *matCellDef="let grupo">{{getJefeNombre(grupo.jefe_id)}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="aula">
+            <th mat-header-cell *matHeaderCellDef>Aula</th>
+            <td mat-cell *matCellDef="let grupo">{{getAulaNombre(grupo.aula_id)}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="edificio">
+            <th mat-header-cell *matHeaderCellDef>Edificio</th>
+            <td mat-cell *matCellDef="let grupo">{{getEdificioNombre(grupo.aula_id)}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="accion">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let grupo">
+              <button mat-icon-button color="warn" (click)="eliminarGrupo(grupo)" matTooltip="Eliminar grupo">
+                <mat-icon>delete_forever</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<div class="snackbar-container">
+  <div *ngIf="error" class="alert alert-danger">
+    {{error}}
+    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
+  </div>
+  <div *ngIf="success" class="alert alert-success">
+    {{success}}
+    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
+  </div>
+</div>

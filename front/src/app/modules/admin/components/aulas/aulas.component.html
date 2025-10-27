@@ -1,0 +1,78 @@
+<div class="aulas-container">
+  <mat-card class="form-card">
+    <mat-card-header>
+      <mat-card-title>Gestión de Aulas</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Número de Aula</mat-label>
+          <input matInput [(ngModel)]="newAula" name="newAula" placeholder="Ej: A101, B202">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Edificio</mat-label>
+          <mat-select [(value)]="selectedEdificio">
+            <mat-option *ngFor="let edificio of edificios" [value]="edificio.id">
+              {{edificio.nombre}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="button-section">
+        <button mat-raised-button color="primary" 
+                (click)="crearAula()" 
+                [disabled]="loading">
+          <mat-icon *ngIf="!loading">meeting_room</mat-icon>
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          <span *ngIf="!loading">Crear Aula</span>
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="table-card">
+    <mat-card-header>
+      <mat-card-title>Aulas Existentes</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="aulas" class="aulas-table">
+          <ng-container matColumnDef="numero">
+            <th mat-header-cell *matHeaderCellDef>Número de Aula</th>
+            <td mat-cell *matCellDef="let aula">{{aula.numero}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="edificio">
+            <th mat-header-cell *matHeaderCellDef>Edificio</th>
+            <td mat-cell *matCellDef="let aula">{{getEdificioNombre(aula.edificio_id)}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let aula">
+              <button mat-icon-button color="warn" (click)="eliminarAula(aula)" matTooltip="Eliminar aula">
+                <mat-icon>delete_forever</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<div class="snackbar-container">
+  <div *ngIf="error" class="alert alert-danger">
+    {{error}}
+    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
+  </div>
+  <div *ngIf="success" class="alert alert-success">
+    {{success}}
+    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
+  </div>
+</div>

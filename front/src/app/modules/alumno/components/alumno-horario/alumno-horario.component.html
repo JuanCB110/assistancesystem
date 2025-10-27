@@ -1,0 +1,133 @@
+<div class="horario-container">
+  <div class="header">
+    <h2>Horario de Clases - {{ getDiaSeleccionado() }}</h2>
+    <p>Consulta tus clases de hoy y verifica la asistencia del profesor</p>
+  </div>
+
+  <!-- Leyenda de estados -->
+  <mat-card class="leyenda-card">
+    <h3>Estado del Profesor:</h3>
+    <div class="leyenda-items">
+      <div class="leyenda-item">
+        <span class="badge badge-presente">Presente</span>
+        <span>El profesor asistió a clase</span>
+      </div>
+      <div class="leyenda-item">
+        <span class="badge badge-retardo">Retardo</span>
+        <span>El profesor llegó tarde</span>
+      </div>
+      <div class="leyenda-item">
+        <span class="badge badge-falta">Falta</span>
+        <span>El profesor no asistió</span>
+      </div>
+      <div class="leyenda-item">
+        <span class="badge badge-pendiente">Sin registro</span>
+        <span>Aún no hay registro de asistencia</span>
+      </div>
+    </div>
+  </mat-card>
+
+  <!-- Filtros -->
+  <mat-card class="filters-card">
+    <div class="filters-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Fecha</mat-label>
+        <input matInput type="date" [(ngModel)]="selectedDate" (change)="onDateChange()">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Carrera</mat-label>
+        <mat-select [(ngModel)]="selectedCarreraFilter" (selectionChange)="onCarreraChange()" [disabled]="loading">
+          <mat-option value="">Seleccione una carrera</mat-option>
+          <mat-option *ngFor="let carrera of carreras" [value]="carrera.id?.toString()">
+            {{ carrera.nombre }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Grupo</mat-label>
+        <mat-select [(ngModel)]="selectedGrupo" (selectionChange)="onGrupoChange()" [disabled]="loading || !selectedCarreraFilter">
+          <mat-option value="">Seleccione un grupo</mat-option>
+          <mat-option *ngFor="let grupo of getGruposFiltrados()" [value]="grupo.id?.toString()">
+            {{ grupo.name }} - {{ grupo.aula?.numero }} ({{ grupo.aula?.edificio?.nombre }})
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Maestro</mat-label>
+        <mat-select [(ngModel)]="selectedMaestro" (selectionChange)="onMaestroChange()" [disabled]="loading">
+          <mat-option value="">Seleccione un maestro</mat-option>
+          <mat-option *ngFor="let maestro of maestros" [value]="maestro.id?.toString()">
+            {{ maestro.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </mat-card>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+    <p>Cargando horario...</p>
+  </div>
+
+  <!-- Tabla de horarios -->
+  <mat-card *ngIf="(selectedGrupo || selectedMaestro) && !loading" class="horario-card">
+    <!-- Header con información del grupo -->
+    <div *ngIf="selectedGrupo && getSelectedGrupo()" class="grupo-info">
+      <h3>Aula: {{ getSelectedGrupo()?.aula?.numero }} - Edificio: {{ getSelectedGrupo()?.aula?.edificio?.nombre }}</h3>
+    </div>
+
+    <div class="table-container">
+      <table class="horario-table">
+        <thead>
+          <tr class="table-header">
+            <th class="hora-column">Hora</th>
+            <th class="clase-column">Clase</th>
+            <th class="estado-column">Estado del Profesor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let hora of getHorasNecesarias()" class="table-row">
+            <td class="hora-cell">{{ formatHora(hora) }}</td>
+            <td class="clase-cell">
+              <div *ngIf="horarioMap.get(getDiaSeleccionado() + '-' + hora)?.materia" class="clase-info">
+                <div class="materia-nombre">{{ horarioMap.get(getDiaSeleccionado() + '-' + hora)?.materia }}</div>
+                <div class="profesor-nombre">{{ horarioMap.get(getDiaSeleccionado() + '-' + hora)?.maestro }}</div>
+                <div class="aula-info">
+                  Aula: {{ horarioMap.get(getDiaSeleccionado() + '-' + hora)?.aula }}
+                  <span *ngIf="horarioMap.get(getDiaSeleccionado() + '-' + hora)?.edificio">
+                    - {{ horarioMap.get(getDiaSeleccionado() + '-' + hora)?.edificio }}
+                  </span>
+                </div>
+              </div>
+              <div *ngIf="!horarioMap.get(getDiaSeleccionado() + '-' + hora)?.materia" class="sin-clase">
+                Sin clase
+              </div>
+            </td>
+            <td class="estado-cell">
+              <div *ngIf="horarioMap.get(getDiaSeleccionado() + '-' + hora)?.materia">
+                <span *ngIf="horarioMap.get(getDiaSeleccionado() + '-' + hora)?.asistencia" class="badge" 
+                      [class.badge-presente]="horarioMap.get(getDiaSeleccionado() + '-' + hora)?.asistencia === 'Presente'"
+                      [class.badge-retardo]="horarioMap.get(getDiaSeleccionado() + '-' + hora)?.asistencia === 'Retardo'"
+                      [class.badge-falta]="horarioMap.get(getDiaSeleccionado() + '-' + hora)?.asistencia === 'Falta'">
+                  {{ horarioMap.get(getDiaSeleccionado() + '-' + hora)?.asistencia }}
+                </span>
+                <span *ngIf="!horarioMap.get(getDiaSeleccionado() + '-' + hora)?.asistencia" class="badge badge-pendiente">
+                  Sin registro
+                </span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </mat-card>
+
+  <!-- Mensaje de éxito/error -->
+  <div *ngIf="success" class="alert alert-success">{{ success }}</div>
+  <div *ngIf="error" class="alert alert-error">{{ error }}</div>
+</div>
+

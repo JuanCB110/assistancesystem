@@ -1,0 +1,20 @@
+<div class="sidebar">
+  <div class="sidebar-header">
+    <mat-icon class="sidebar-icon">school</mat-icon>
+    <h3>Alumno</h3>
+  </div>
+
+  <nav class="sidebar-nav">
+    <a routerLink="/alumno/horario" routerLinkActive="active" class="nav-item">
+      <mat-icon>schedule</mat-icon>
+      <span>Horario</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button mat-button class="logout-button" (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Cerrar Sesión</span>
+    </button>
+  </div>
+</div>

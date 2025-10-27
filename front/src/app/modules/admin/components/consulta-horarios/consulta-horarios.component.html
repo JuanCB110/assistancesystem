@@ -1,0 +1,94 @@
+<div class="consulta-horarios-container">
+  <mat-card class="filter-card">
+    <mat-card-header>
+      <mat-card-title>Consulta de Horarios</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="filter-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Filtrar por</mat-label>
+          <mat-select [(value)]="filtroTipo">
+            <mat-option value="carrera">Carrera</mat-option>
+            <mat-option value="maestro">Maestro</mat-option>
+            <mat-option value="grupo">Grupo</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" *ngIf="filtroTipo === 'carrera'">
+          <mat-label>Carrera</mat-label>
+          <mat-select [(value)]="filtroCarrera">
+            <mat-option *ngFor="let carrera of carreras" [value]="carrera.id">
+              {{carrera.nombre}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" *ngIf="filtroTipo === 'maestro'">
+          <mat-label>Maestro</mat-label>
+          <mat-select [(value)]="filtroMaestro">
+            <mat-option *ngFor="let maestro of maestros" [value]="maestro.id">
+              {{maestro.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" *ngIf="filtroTipo === 'grupo'">
+          <mat-label>Grupo</mat-label>
+          <mat-select [(value)]="filtroGrupo">
+            <mat-option *ngFor="let grupo of grupos" [value]="grupo.id">
+              {{grupo.name}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" (click)="buscarHorarios()">
+          Buscar
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="table-card" *ngIf="horarios.length > 0">
+    <mat-card-header>
+      <mat-card-title>Horarios Encontrados</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="horarios" class="horarios-table">
+          <ng-container matColumnDef="maestro">
+            <th mat-header-cell *matHeaderCellDef>Maestro</th>
+            <td mat-cell *matCellDef="let horario">{{getMaestroNombre(horario.maestro_id)}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="materia">
+            <th mat-header-cell *matHeaderCellDef>Materia</th>
+            <td mat-cell *matCellDef="let horario">{{getMateriaNombre(horario.materia_id)}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="grupo">
+            <th mat-header-cell *matHeaderCellDef>Grupo</th>
+            <td mat-cell *matCellDef="let horario">{{getGrupoNombre(horario.grupo_id)}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="aula">
+            <th mat-header-cell *matHeaderCellDef>Aula - Edificio</th>
+            <td mat-cell *matCellDef="let horario">{{getAulaInfo(horario.grupo_id)}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="dia">
+            <th mat-header-cell *matHeaderCellDef>Días</th>
+            <td mat-cell *matCellDef="let horario">{{horario.dias}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="hora">
+            <th mat-header-cell *matHeaderCellDef>Hora</th>
+            <td mat-cell *matCellDef="let horario">{{horario.hora_inicio}} - {{horario.hora_fin}}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,135 @@
+<div class="usuarios-container">
+  <mat-card class="tabs-card">
+    <mat-tab-group [(selectedIndex)]="tabValue" (selectedTabChange)="onTabChange($event)">
+      <mat-tab label="Agregar"></mat-tab>
+      <mat-tab label="Editar"></mat-tab>
+    </mat-tab-group>
+  </mat-card>
+
+  <mat-card *ngIf="tabValue === 0" class="form-card">
+    <mat-card-header>
+      <mat-card-title>Agregar nuevo usuario</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form class="user-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Rol</mat-label>
+          <mat-select [(value)]="role">
+            <mat-option *ngFor="let r of roles" [value]="r">{{r}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Número de Cuenta</mat-label>
+          <input matInput [(ngModel)]="numeroCuenta" name="numeroCuenta" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre del usuario</mat-label>
+          <input matInput [(ngModel)]="userName" name="userName" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Correo Electrónico</mat-label>
+          <input matInput type="email" [(ngModel)]="email" name="email" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput type="password" [(ngModel)]="password" name="password" required>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" 
+                class="full-width submit-btn"
+                (click)="handleAddUser()" 
+                [disabled]="loading">
+          <mat-icon *ngIf="!loading">person_add</mat-icon>
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          <span *ngIf="!loading">Crear usuario</span>
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card *ngIf="tabValue === 1" class="form-card">
+    <mat-card-header>
+      <mat-card-title>Editar usuario</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="search-section">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Buscar por número de cuenta o ID</mat-label>
+          <input matInput [(ngModel)]="searchAccount" name="searchAccount">
+        </mat-form-field>
+        <button mat-raised-button color="primary" 
+                (click)="handleSearch()" 
+                [disabled]="loading"
+                class="search-btn">
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          <span *ngIf="!loading">Buscar</span>
+        </button>
+      </div>
+
+      <form class="user-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>ID</mat-label>
+          <input matInput [(ngModel)]="accountNumber" name="accountNumber" readonly>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Rol</mat-label>
+          <mat-select [(value)]="role" [disabled]="!selectedUser">
+            <mat-option *ngFor="let r of roles" [value]="r">{{r}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Número de cuenta</mat-label>
+          <input matInput [(ngModel)]="numeroCuenta" name="numeroCuenta" [disabled]="!selectedUser">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nombre del usuario</mat-label>
+          <input matInput [(ngModel)]="userName" name="userName" [disabled]="!selectedUser">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Correo Electrónico</mat-label>
+          <input matInput type="email" [(ngModel)]="email" name="email" [disabled]="!selectedUser">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Contraseña</mat-label>
+          <input matInput type="password" [(ngModel)]="password" name="password" [disabled]="!selectedUser">
+          <mat-hint>Dejar en blanco para mantener la contraseña actual</mat-hint>
+        </mat-form-field>
+
+        <div class="button-group">
+          <button mat-raised-button color="warn" 
+                  (click)="handleDelete()" 
+                  [disabled]="!selectedUser || loading">
+            <mat-icon>delete_forever</mat-icon>
+            Eliminar
+          </button>
+          <button mat-raised-button color="primary" 
+                  (click)="handleSave()" 
+                  [disabled]="!selectedUser || loading">
+            <mat-icon>save</mat-icon>
+            Guardar
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<div class="snackbar-container">
+  <div *ngIf="error" class="alert alert-danger" role="alert">
+    {{error}}
+    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
+  </div>
+  <div *ngIf="success" class="alert alert-success" role="alert">
+    {{success}}
+    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
+  </div>
+</div>

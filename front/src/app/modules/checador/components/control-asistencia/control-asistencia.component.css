@@ -1,0 +1,237 @@
+.control-asistencia-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header-card {
+  margin-bottom: 2rem;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+mat-card-title {
+  font-size: 2rem;
+  color: #1e3a8a;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.date-selector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.date-selector mat-form-field {
+  width: 220px;
+}
+
+.date-selector button {
+  height: 56px;
+  font-weight: 600;
+}
+
+.filtros {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filtros mat-form-field {
+  min-width: 220px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+}
+
+.table-card {
+  margin-top: 1.5rem;
+  overflow: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.horario-table {
+  width: 100%;
+  background: white;
+}
+
+.header-hora,
+.header-dia {
+  background: #1e3a8a !important;
+  color: white !important;
+  font-weight: 700 !important;
+  font-size: 1.1rem !important;
+  text-align: center !important;
+  padding: 1rem !important;
+}
+
+.cell-hora {
+  font-weight: 700;
+  font-size: 1rem;
+  text-align: center;
+  background: #f3f4f6;
+  padding: 1rem !important;
+  vertical-align: middle;
+}
+
+.cell-dia {
+  padding: 0.75rem !important;
+  border: 1px solid rgba(224, 224, 224, 1);
+  vertical-align: top;
+}
+
+.cell-dia.has-class {
+  background: rgba(200, 230, 255, 0.15);
+}
+
+.horario-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.materia-nombre {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #1e3a8a;
+}
+
+.grupo-info {
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+.ubicacion-info {
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
+
+.estado-info {
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+}
+
+.estado-presente {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.estado-ausente {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+.estado-retardo {
+  color: #ea580c;
+  background: #fed7aa;
+}
+
+.estado-pendiente {
+  color: #d97706;
+  background: #fef3c7;
+}
+
+.botones-asistencia {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.botones-asistencia button {
+  min-width: 100px;
+  font-weight: 600;
+}
+
+.btn-presente.selected {
+  background-color: #047857 !important;
+  color: white !important;
+}
+
+.btn-ausente.selected {
+  background-color: #dc2626 !important;
+  color: white !important;
+}
+
+.btn-retardo.selected {
+  background-color: #ea580c !important;
+  color: white !important;
+}
+
+.sin-clase {
+  text-align: center;
+  color: #9ca3af;
+  font-style: italic;
+  padding: 1rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  margin-top: 2rem;
+}
+
+.empty-state mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #9ca3af;
+  margin-bottom: 1rem;
+}
+
+.empty-state p {
+  font-size: 1.125rem;
+  color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .control-asistencia-container {
+    padding: 1rem;
+  }
+
+  .date-selector,
+  .filtros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .date-selector mat-form-field,
+  .filtros mat-form-field {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .botones-asistencia {
+    flex-direction: column;
+  }
+
+  .botones-asistencia button {
+    width: 100%;
+  }
+}
+
+/* Snackbar styles */
+::ng-deep .success-snackbar {
+  background-color: #047857 !important;
+  color: white !important;
+}
+
+::ng-deep .error-snackbar {
+  background-color: #dc2626 !important;
+  color: white !important;
+}

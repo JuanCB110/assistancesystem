@@ -1,0 +1,134 @@
+<div class="consulta-asistencias-container">
+  <h2 class="page-title">Sistema de Asistencias</h2>
+
+  <div class="maestro-info">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Seleccione al maestro</mat-label>
+      <mat-select [(value)]="selectedMaestro" (selectionChange)="onMaestroChange()">
+        <mat-option *ngFor="let maestro of maestros" [value]="maestro.id">
+          {{maestro.name}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="week-navigation">
+      <button mat-raised-button (click)="previousWeek()">
+        Semana Anterior
+      </button>
+
+      <div class="date-picker-container">
+        <mat-form-field appearance="outline">
+          <mat-label>Seleccionar fecha</mat-label>
+          <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" (dateChange)="onDateChange($event)">
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <button mat-raised-button (click)="nextWeek()">
+        Siguiente Semana
+      </button>
+    </div>
+
+    <div class="week-info">
+      <p>Semana del {{getWeekStartFormatted()}} al {{getWeekEndFormatted()}}</p>
+    </div>
+  </div>
+
+  <div *ngIf="selectedMaestro" class="stats-container">
+    <div class="stat-item">
+      <span>Total de clases: <strong>{{weekStats.total}}</strong></span>
+    </div>
+    <div class="stat-item success">
+      <span>Asistencias: 
+        <strong>{{weekStats.asistencias.checador}}</strong> (Checador) | 
+        <strong>{{weekStats.asistencias.jefe}}</strong> (Jefe) | 
+        <strong>{{weekStats.asistencias.maestro}}</strong> (Maestro)
+      </span>
+    </div>
+    <div class="stat-item error">
+      <span>Faltas: 
+        <strong>{{weekStats.faltas.checador}}</strong> (Checador) | 
+        <strong>{{weekStats.faltas.jefe}}</strong> (Jefe) | 
+        <strong>{{weekStats.faltas.maestro}}</strong> (Maestro)
+      </span>
+    </div>
+  </div>
+
+  <div class="horario-header">
+    <h3>HORARIO DEL MAESTRO</h3>
+  </div>
+
+  <div *ngFor="let dia of diasSemana" class="day-section">
+    <div class="day-header">
+      <span class="day-name">{{dia.nombre}}</span>
+    </div>
+
+    <div class="table-container">
+      <table mat-table [dataSource]="getHorariosForDay(dia.nombre)" class="asistencias-table">
+        <ng-container matColumnDef="hora">
+          <th mat-header-cell *matHeaderCellDef>Hora</th>
+          <td mat-cell *matCellDef="let horario">{{horario.hora}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="materia">
+          <th mat-header-cell *matHeaderCellDef>Materia</th>
+          <td mat-cell *matCellDef="let horario">{{horario.materia?.name || 'N/A'}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="grupo">
+          <th mat-header-cell *matHeaderCellDef>Grupo</th>
+          <td mat-cell *matCellDef="let horario">{{horario.grupo?.name || 'N/A'}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="checador">
+          <th mat-header-cell *matHeaderCellDef>Checador</th>
+          <td mat-cell *matCellDef="let horario">
+            <span [class]="'estado ' + getEstadoClass(getAsistenciaEstado(horario.id, 'checador'))">
+              {{getEstadoText(getAsistenciaEstado(horario.id, 'checador'))}}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="jefe">
+          <th mat-header-cell *matHeaderCellDef>Jefe de Grupo</th>
+          <td mat-cell *matCellDef="let horario">
+            <span [class]="'estado ' + getEstadoClass(getAsistenciaEstado(horario.id, 'jefe'))">
+              {{getEstadoText(getAsistenciaEstado(horario.id, 'jefe'))}}
+            </span>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="maestro">
+          <th mat-header-cell *matHeaderCellDef>Maestro</th>
+          <td mat-cell *matCellDef="let horario">
+            <span [class]="'estado ' + getEstadoClass(getAsistenciaEstado(horario.id, 'maestro'))">
+              {{getEstadoText(getAsistenciaEstado(horario.id, 'maestro'))}}
+            </span>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+        <!-- Fila vacía cuando no hay clases -->
+        <tr *ngIf="getHorariosForDay(dia.nombre).length === 0" class="empty-row">
+          <td colspan="6" class="empty-cell">No hay clases programadas para este día</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+</div>
+
+<!-- Alertas -->
+<div class="snackbar-container">
+  <div *ngIf="error" class="alert alert-danger">
+    {{error}}
+    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
+  </div>
+</div>
