@@ -62,7 +62,6 @@ export class MateriasComponent implements OnInit {
     try {
       this.materias = await this.materiaService.getAll();
     } catch (error) {
-      console.error('Error al cargar materias:', error);
       this.error = 'Error al cargar las materias de la base de datos';
     } finally {
       this.loading = false;
@@ -73,7 +72,7 @@ export class MateriasComponent implements OnInit {
     try {
       this.carreras = await this.carreraService.getAll();
     } catch (error) {
-      console.error('Error al cargar carreras:', error);
+      // Error al cargar carreras
     }
   }
 
@@ -98,7 +97,6 @@ export class MateriasComponent implements OnInit {
       this.clearForm();
       await this.loadMaterias();
     } catch (error) {
-      console.error('Error al crear materia:', error);
       this.error = 'Error al crear la materia';
     } finally {
       this.loading = false;
@@ -120,7 +118,6 @@ export class MateriasComponent implements OnInit {
       this.success = 'Materia eliminada correctamente';
       await this.loadMaterias();
     } catch (error) {
-      console.error('Error al eliminar materia:', error);
       this.error = 'Error al eliminar la materia';
     } finally {
       this.loading = false;

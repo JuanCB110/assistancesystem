@@ -15,7 +15,6 @@ export class MateriaService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener materias:', error);
       return [];
     }
   }
@@ -26,7 +25,6 @@ export class MateriaService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener materias por carrera:', error);
       return [];
     }
   }
@@ -37,7 +35,6 @@ export class MateriaService {
       const result = await response.json();
       return result.data || null;
     } catch (error) {
-      console.error('Error al obtener materia:', error);
       return null;
     }
   }
@@ -52,7 +49,6 @@ export class MateriaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al crear materia:', error);
       throw error;
     }
   }
@@ -67,7 +63,6 @@ export class MateriaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al actualizar materia:', error);
       throw error;
     }
   }
@@ -78,7 +73,6 @@ export class MateriaService {
         method: 'DELETE'
       });
     } catch (error) {
-      console.error('Error al eliminar materia:', error);
       throw error;
     }
   }

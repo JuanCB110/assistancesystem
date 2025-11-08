@@ -46,8 +46,8 @@ export class JefeHorarioComponent implements OnInit {
   horarioMap = new Map<string, HorarioData>();
   grupoInfo: { name: string; aula: string; edificio: string } | null = null;
   diaActual = '';
-  selectedDate = new Date().toISOString().split('T')[0];
-  maxDate = new Date().toISOString().split('T')[0];
+  selectedDate = '';
+  maxDate = '';
   horasNecesarias: string[] = [];
   
   displayedColumns = ['hora', 'dia'];
@@ -74,8 +74,18 @@ export class JefeHorarioComponent implements OnInit {
       return;
     }
     
+    this.selectedDate = this.getToday();
+    this.maxDate = this.getToday();
     this.updateDiaActual();
     this.cargarHorarios();
+  }
+
+  getToday(): string {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   updateDiaActual() {
@@ -172,7 +182,6 @@ export class JefeHorarioComponent implements OnInit {
       setTimeout(() => this.success = null, 3000);
     } catch (error: any) {
       this.error = error.message || 'Error al cargar horarios';
-      console.error(error);
     } finally {
       this.loading = false;
     }
@@ -226,7 +235,6 @@ export class JefeHorarioComponent implements OnInit {
       setTimeout(() => this.success = null, 3000);
     } catch (error: any) {
       this.error = 'Error al actualizar asistencia: ' + error.message;
-      console.error('Error en handleToggleAsistencia:', error);
     } finally {
       this.loading = false;
     }
@@ -237,7 +245,7 @@ export class JefeHorarioComponent implements OnInit {
   }
 
   setHoy() {
-    this.selectedDate = new Date().toISOString().split('T')[0];
+    this.selectedDate = this.getToday();
     this.cargarHorarios();
   }
 

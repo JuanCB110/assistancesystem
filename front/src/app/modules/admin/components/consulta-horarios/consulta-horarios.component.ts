@@ -61,7 +61,7 @@ export class ConsultaHorariosComponent implements OnInit {
       this.grupos = await this.grupoService.getAll();
       this.carreras = await this.carreraService.getAll();
     } catch (err: any) {
-      console.error('Error al cargar datos de selectores:', err);
+      // Error al cargar datos de selectores
     }
   }
 
@@ -79,7 +79,7 @@ export class ConsultaHorariosComponent implements OnInit {
 
       this.horarios = await this.horarioService.searchHorarios(filtros);
     } catch (err: any) {
-      console.error('Error al buscar horarios:', err);
+      // Error al buscar horarios
     }
   }
 

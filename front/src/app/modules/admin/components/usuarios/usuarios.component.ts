@@ -69,7 +69,6 @@ export class UsuariosComponent implements OnInit {
     try {
       this.usuarios = await this.usuarioService.getAll();
     } catch (error) {
-      console.error('Error al cargar usuarios:', error);
       this.error = 'Error al cargar los usuarios de la base de datos';
     } finally {
       this.loading = false;
@@ -117,7 +116,6 @@ export class UsuariosComponent implements OnInit {
         this.clearForm();
       }
     } catch (error) {
-      console.error('Error al buscar usuario:', error);
       this.error = 'Error al buscar el usuario';
     } finally {
       this.loading = false;
@@ -165,7 +163,6 @@ export class UsuariosComponent implements OnInit {
       this.password = '';
       await this.loadUsuarios();
     } catch (error) {
-      console.error('Error al actualizar usuario:', error);
       this.error = 'Error al actualizar el usuario';
     } finally {
       this.loading = false;
@@ -191,7 +188,6 @@ export class UsuariosComponent implements OnInit {
       this.clearForm();
       await this.loadUsuarios();
     } catch (error) {
-      console.error('Error al eliminar usuario:', error);
       this.error = 'Error al eliminar el usuario';
     } finally {
       this.loading = false;
@@ -221,7 +217,6 @@ export class UsuariosComponent implements OnInit {
       this.clearForm();
       await this.loadUsuarios();
     } catch (error) {
-      console.error('Error al crear usuario:', error);
       this.error = 'Error al crear el usuario';
     } finally {
       this.loading = false;

@@ -49,7 +49,6 @@ export class EdificiosComponent implements OnInit {
     try {
       this.edificios = await this.edificioService.getAll();
     } catch (error) {
-      console.error('Error al cargar edificios:', error);
       this.error = 'Error al cargar los edificios de la base de datos';
     } finally {
       this.loading = false;
@@ -75,7 +74,6 @@ export class EdificiosComponent implements OnInit {
       this.clearForm();
       await this.loadEdificios();
     } catch (error) {
-      console.error('Error al crear edificio:', error);
       this.error = 'Error al crear el edificio';
     } finally {
       this.loading = false;
@@ -97,7 +95,6 @@ export class EdificiosComponent implements OnInit {
       this.success = 'Edificio eliminado correctamente';
       await this.loadEdificios();
     } catch (error) {
-      console.error('Error al eliminar edificio:', error);
       this.error = 'Error al eliminar el edificio';
     } finally {
       this.loading = false;

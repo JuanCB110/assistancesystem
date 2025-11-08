@@ -21,7 +21,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener asistencias checador:', error);
       return [];
     }
   }
@@ -36,7 +35,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al crear asistencia checador:', error);
       throw error;
     }
   }
@@ -51,7 +49,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al actualizar asistencia checador:', error);
       throw error;
     }
   }
@@ -68,7 +65,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener asistencias jefe:', error);
       return [];
     }
   }
@@ -83,7 +79,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al crear asistencia jefe:', error);
       throw error;
     }
   }
@@ -98,7 +93,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al actualizar asistencia jefe:', error);
       throw error;
     }
   }
@@ -115,7 +109,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener asistencias maestro:', error);
       return [];
     }
   }
@@ -130,7 +123,20 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al crear asistencia maestro:', error);
+      throw error;
+    }
+  }
+
+  async updateAsistenciaMaestro(id: number, asistencia: 'Presente' | 'Falta' | 'Retardo'): Promise<AsistenciaMaestro> {
+    try {
+      const response = await fetch(`${this.apiUrl}/maestro/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ asistencia })
+      });
+      const result = await response.json();
+      return result.data;
+    } catch (error) {
       throw error;
     }
   }
@@ -142,7 +148,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al obtener resumen de asistencias:', error);
       return null;
     }
   }
@@ -154,7 +159,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener asistencias:', error);
       return [];
     }
   }
@@ -165,7 +169,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener asistencias del horario:', error);
       return [];
     }
   }
@@ -176,7 +179,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener asistencias del maestro:', error);
       return [];
     }
   }
@@ -187,7 +189,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data || null;
     } catch (error) {
-      console.error('Error al obtener asistencia:', error);
       return null;
     }
   }
@@ -202,7 +203,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al crear asistencia:', error);
       throw error;
     }
   }
@@ -217,7 +217,6 @@ export class AsistenciaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al actualizar asistencia:', error);
       throw error;
     }
   }
@@ -228,7 +227,6 @@ export class AsistenciaService {
         method: 'DELETE'
       });
     } catch (error) {
-      console.error('Error al eliminar asistencia:', error);
       throw error;
     }
   }

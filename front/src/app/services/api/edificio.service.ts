@@ -15,7 +15,6 @@ export class EdificioService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener edificios:', error);
       return [];
     }
   }
@@ -26,7 +25,6 @@ export class EdificioService {
       const result = await response.json();
       return result.data || null;
     } catch (error) {
-      console.error('Error al obtener edificio:', error);
       return null;
     }
   }
@@ -41,7 +39,6 @@ export class EdificioService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al crear edificio:', error);
       throw error;
     }
   }
@@ -56,7 +53,6 @@ export class EdificioService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al actualizar edificio:', error);
       throw error;
     }
   }
@@ -67,7 +63,6 @@ export class EdificioService {
         method: 'DELETE'
       });
     } catch (error) {
-      console.error('Error al eliminar edificio:', error);
       throw error;
     }
   }

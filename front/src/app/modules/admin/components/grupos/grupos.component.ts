@@ -75,7 +75,6 @@ export class GruposComponent implements OnInit {
     try {
       this.grupos = await this.grupoService.getAll();
     } catch (error) {
-      console.error('Error al cargar grupos:', error);
       this.error = 'Error al cargar los grupos de la base de datos';
     } finally {
       this.loading = false;
@@ -86,7 +85,7 @@ export class GruposComponent implements OnInit {
     try {
       this.carreras = await this.carreraService.getAll();
     } catch (error) {
-      console.error('Error al cargar carreras:', error);
+      // Error al cargar carreras
     }
   }
 
@@ -94,7 +93,7 @@ export class GruposComponent implements OnInit {
     try {
       this.jefes = await this.usuarioService.getJefes();
     } catch (error) {
-      console.error('Error al cargar jefes:', error);
+      // Error al cargar jefes
     }
   }
 
@@ -102,7 +101,7 @@ export class GruposComponent implements OnInit {
     try {
       this.edificios = await this.edificioService.getAll();
     } catch (error) {
-      console.error('Error al cargar edificios:', error);
+      // Error al cargar edificios
     }
   }
 
@@ -110,7 +109,7 @@ export class GruposComponent implements OnInit {
     try {
       this.aulas = await this.aulaService.getAll();
     } catch (error) {
-      console.error('Error al cargar aulas:', error);
+      // Error al cargar aulas
     }
   }
 
@@ -136,7 +135,6 @@ export class GruposComponent implements OnInit {
       this.clearForm();
       await this.loadGrupos();
     } catch (error) {
-      console.error('Error al crear grupo:', error);
       this.error = 'Error al crear el grupo';
     } finally {
       this.loading = false;
@@ -158,7 +156,6 @@ export class GruposComponent implements OnInit {
       this.success = 'Grupo eliminado correctamente';
       await this.loadGrupos();
     } catch (error) {
-      console.error('Error al eliminar grupo:', error);
       this.error = 'Error al eliminar el grupo';
     } finally {
       this.loading = false;

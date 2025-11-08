@@ -15,7 +15,6 @@ export class UsuarioService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener usuarios:', error);
       return [];
     }
   }
@@ -26,7 +25,6 @@ export class UsuarioService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener usuarios por rol:', error);
       return [];
     }
   }
@@ -37,7 +35,6 @@ export class UsuarioService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener maestros:', error);
       return [];
     }
   }
@@ -52,7 +49,6 @@ export class UsuarioService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener jefes:', error);
       return [];
     }
   }
@@ -63,7 +59,6 @@ export class UsuarioService {
       const result = await response.json();
       return result.data || null;
     } catch (error) {
-      console.error('Error al obtener usuario:', error);
       return null;
     }
   }

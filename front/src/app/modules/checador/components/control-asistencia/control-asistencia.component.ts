@@ -94,7 +94,10 @@ export class ControlAsistenciaComponent implements OnInit {
 
   getToday(): string {
     const today = new Date();
-    return today.toISOString().split('T')[0];
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   handleHoyClick() {
@@ -109,7 +112,10 @@ export class ControlAsistenciaComponent implements OnInit {
   updateDiaActual() {
     // Evitar problemas de zona horaria
     const partes = this.selectedDate.split('-');
-    const selectedDateObj = new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
+    const year = parseInt(partes[0]);
+    const month = parseInt(partes[1]) - 1;
+    const day = parseInt(partes[2]);
+    const selectedDateObj = new Date(year, month, day);
     const diaSemana = selectedDateObj.getDay();
     
     if (diaSemana === 0 || diaSemana === 6) {
@@ -128,7 +134,6 @@ export class ControlAsistenciaComponent implements OnInit {
       this.edificios = await this.edificioService.getAll();
     } catch (error: any) {
       this.showError('Error al cargar edificios');
-      console.error(error);
     }
   }
 
@@ -147,7 +152,6 @@ export class ControlAsistenciaComponent implements OnInit {
       this.cargarHorarios();
     } catch (error: any) {
       this.showError('Error al cargar aulas');
-      console.error(error);
     }
   }
 
@@ -243,7 +247,6 @@ export class ControlAsistenciaComponent implements OnInit {
       this.horarioData = horarioMap;
     } catch (error: any) {
       this.showError('Error al cargar horarios: ' + error.message);
-      console.error(error);
     } finally {
       this.loading = false;
     }
@@ -301,7 +304,6 @@ export class ControlAsistenciaComponent implements OnInit {
       }
     } catch (error: any) {
       this.showError('Error al registrar asistencia: ' + error.message);
-      console.error(error);
     } finally {
       this.loading = false;
     }

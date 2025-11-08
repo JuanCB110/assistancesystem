@@ -87,7 +87,6 @@ export class GestionHorariosComponent implements OnInit {
       this.carreras = await this.carreraService.getAll();
       this.horarios = await this.horarioService.getAll();
     } catch (error) {
-      console.error('Error al cargar datos:', error);
       this.error = 'Error al cargar datos de la base de datos';
     } finally {
       this.loading = false;
@@ -128,7 +127,6 @@ export class GestionHorariosComponent implements OnInit {
       this.clearForm();
       await this.loadData();
     } catch (error) {
-      console.error('Error al crear horarios:', error);
       this.error = 'Error al crear los horarios';
     } finally {
       this.loading = false;
@@ -219,7 +217,6 @@ export class GestionHorariosComponent implements OnInit {
       this.success = 'Horario eliminado correctamente';
       await this.loadData();
     } catch (error) {
-      console.error('Error al eliminar horario:', error);
       this.error = 'Error al eliminar el horario';
     } finally {
       this.loading = false;

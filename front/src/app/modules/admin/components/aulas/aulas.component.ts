@@ -55,7 +55,7 @@ export class AulasComponent implements OnInit {
     try {
       this.edificios = await this.edificioService.getAll();
     } catch (error) {
-      console.error('Error al cargar edificios:', error);
+      // Error al cargar edificios
     }
   }
 
@@ -65,7 +65,6 @@ export class AulasComponent implements OnInit {
     try {
       this.aulas = await this.aulaService.getAll();
     } catch (error) {
-      console.error('Error al cargar aulas:', error);
       this.error = 'Error al cargar las aulas de la base de datos';
     } finally {
       this.loading = false;
@@ -92,7 +91,6 @@ export class AulasComponent implements OnInit {
       this.clearForm();
       await this.loadAulas();
     } catch (error) {
-      console.error('Error al crear aula:', error);
       this.error = 'Error al crear el aula';
     } finally {
       this.loading = false;
@@ -114,7 +112,6 @@ export class AulasComponent implements OnInit {
       this.success = 'Aula eliminada correctamente';
       await this.loadAulas();
     } catch (error) {
-      console.error('Error al eliminar aula:', error);
       this.error = 'Error al eliminar el aula';
     } finally {
       this.loading = false;

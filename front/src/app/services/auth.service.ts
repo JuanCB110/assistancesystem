@@ -42,9 +42,6 @@ export class AuthService {
   }
 
   navigateByRole(role: string): void {
-    console.log('navigateByRole llamado con rol:', role);
-    console.log('Tipo de rol:', typeof role);
-    
     // Normalizar el rol para comparación
     const normalizedRole = role?.trim();
     
@@ -54,21 +51,17 @@ export class AuthService {
       'Jefe_de_Grupo': '/jefe/horario',
       'Jefe de Grupo': '/jefe/horario', // Variante con espacio
       'Checador': '/checador/control-asistencia',
-      'Maestro': '/maestro/horario'
+      'Maestro': '/maestro/dashboard'
     };
     
     const targetRoute = roleRoutes[normalizedRole];
-    console.log('Ruta encontrada:', targetRoute);
     
     if (!targetRoute) {
-      console.warn('⚠️ No se encontró ruta para el rol:', normalizedRole);
-      console.log('Roles disponibles:', Object.keys(roleRoutes));
       // Si no encuentra el rol, ir a login en lugar de admin
       this.router.navigate(['/login']);
       return;
     }
     
-    console.log('✅ Navegando a:', targetRoute);
     this.router.navigate([targetRoute]);
   }
 
@@ -78,7 +71,7 @@ export class AuthService {
     try {
       localStorage.setItem('user_data', JSON.stringify(user));
     } catch (error) {
-      console.error('Error al guardar usuario en localStorage:', error);
+      // Error al guardar usuario en localStorage
     }
   }
 
@@ -102,9 +95,6 @@ export class AuthService {
 
       const user: User = result.data.user;
       const token = result.data.token;
-
-      console.log('Usuario recibido del backend:', user);
-      console.log('Rol del usuario:', user.role);
 
       // Guardar token
       localStorage.setItem('auth_token', token);
@@ -156,15 +146,13 @@ export class AuthService {
       try {
         localStorage.setItem('user_data', JSON.stringify(currentUser));
       } catch (error) {
-        console.error('Error al actualizar rol:', error);
+        // Error al actualizar rol
       }
     }
   }
 
   // Método signOut - regresar al login
   async signOut(): Promise<void> {
-    console.log('Cerrando sesión...');
-    
     // Limpiar el estado del usuario
     this.userSubject.next(null);
     
@@ -172,11 +160,7 @@ export class AuthService {
     localStorage.removeItem('user_data');
     localStorage.removeItem('auth_token');
     
-    console.log('Usuario y tokens eliminados');
-    
     // Navegar al login
     await this.router.navigate(['/login']);
-    
-    console.log('Navegado a login');
   }
 }

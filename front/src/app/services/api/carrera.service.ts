@@ -15,7 +15,6 @@ export class CarreraService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener carreras:', error);
       return [];
     }
   }
@@ -26,7 +25,6 @@ export class CarreraService {
       const result = await response.json();
       return result.data || null;
     } catch (error) {
-      console.error('Error al obtener carrera:', error);
       return null;
     }
   }

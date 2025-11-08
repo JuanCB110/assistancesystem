@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Logger simple
 app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  // Logging de requests
   next();
 });
 
@@ -60,12 +60,7 @@ app.use((req, res) => {
 
 // Iniciar servidor
 app.listen(PORT, () => {
-  console.log(`
-Puerto: ${PORT}
-Entorno: ${process.env.NODE_ENV || 'development'}
-URL: http://localhost:${PORT}
-API: http://localhost:${PORT}/api
-  `);
+  // Servidor iniciado
 });
 
 export default app;

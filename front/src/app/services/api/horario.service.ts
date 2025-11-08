@@ -15,7 +15,6 @@ export class HorarioService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener horarios:', error);
       return [];
     }
   }
@@ -26,7 +25,6 @@ export class HorarioService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener horarios del maestro:', error);
       return [];
     }
   }
@@ -37,7 +35,6 @@ export class HorarioService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener horarios del grupo:', error);
       return [];
     }
   }
@@ -48,7 +45,6 @@ export class HorarioService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener horarios de la carrera:', error);
       return [];
     }
   }
@@ -76,7 +72,6 @@ export class HorarioService {
       const result = await response.json();
       return result.data || null;
     } catch (error) {
-      console.error('Error al obtener horario:', error);
       return null;
     }
   }
@@ -91,7 +86,6 @@ export class HorarioService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al crear horario:', error);
       throw error;
     }
   }
@@ -106,7 +100,6 @@ export class HorarioService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al crear horarios múltiples:', error);
       throw error;
     }
   }
@@ -121,7 +114,6 @@ export class HorarioService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al actualizar horario:', error);
       throw error;
     }
   }
@@ -132,7 +124,6 @@ export class HorarioService {
         method: 'DELETE'
       });
     } catch (error) {
-      console.error('Error al eliminar horario:', error);
       throw error;
     }
   }

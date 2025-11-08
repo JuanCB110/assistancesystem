@@ -15,7 +15,6 @@ export class GrupoService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener grupos:', error);
       return [];
     }
   }
@@ -26,7 +25,6 @@ export class GrupoService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener grupos por carrera:', error);
       return [];
     }
   }
@@ -37,7 +35,6 @@ export class GrupoService {
       const result = await response.json();
       return result.data || null;
     } catch (error) {
-      console.error('Error al obtener grupo:', error);
       return null;
     }
   }
@@ -52,7 +49,6 @@ export class GrupoService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al crear grupo:', error);
       throw error;
     }
   }
@@ -67,7 +63,6 @@ export class GrupoService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al actualizar grupo:', error);
       throw error;
     }
   }
@@ -78,7 +73,6 @@ export class GrupoService {
         method: 'DELETE'
       });
     } catch (error) {
-      console.error('Error al eliminar grupo:', error);
       throw error;
     }
   }

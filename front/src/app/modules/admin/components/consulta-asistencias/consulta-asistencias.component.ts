@@ -81,7 +81,6 @@ export class ConsultaAsistenciasComponent implements OnInit {
     try {
       this.maestros = await this.usuarioService.getMaestros();
     } catch (error) {
-      console.error('Error al cargar maestros:', error);
       this.error = 'Error al cargar maestros de la base de datos';
     }
   }
@@ -107,7 +106,6 @@ export class ConsultaAsistenciasComponent implements OnInit {
       
       this.horarios = await this.horarioService.getByMaestro(Number(this.selectedMaestro));
     } catch (error) {
-      console.error('Error al consultar asistencias:', error);
       this.error = 'Error al consultar las asistencias';
     } finally {
       this.loading = false;
@@ -116,24 +114,30 @@ export class ConsultaAsistenciasComponent implements OnInit {
 
   getWeekStartDate(): string {
     const date = new Date(this.selectedDate);
-    const day = date.getDay();
-    const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+    const dayOfWeek = date.getDay();
+    const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
     date.setDate(diff);
-    return date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   getWeekEndDate(): string {
     const date = new Date(this.selectedDate);
-    const day = date.getDay();
-    const diff = date.getDate() - day + (day === 0 ? -6 : 1) + 6;
+    const dayOfWeek = date.getDay();
+    const diff = date.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1) + 6;
     date.setDate(diff);
-    return date.toISOString().split('T')[0];
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   getWeekRange(): string {
     const startOfWeek = new Date(this.selectedDate);
-    const day = startOfWeek.getDay();
-    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
+    const dayOfWeek = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
     startOfWeek.setDate(diff);
     
     const endOfWeek = new Date(startOfWeek);

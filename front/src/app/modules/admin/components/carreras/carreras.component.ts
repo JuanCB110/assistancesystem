@@ -53,7 +53,6 @@ export class CarrerasComponent implements OnInit {
     try {
       this.carreras = await this.carreraService.getAll();
     } catch (error) {
-      console.error('Error al cargar carreras:', error);
       this.error = 'Error al cargar las carreras de la base de datos';
     } finally {
       this.loading = false;
@@ -80,7 +79,6 @@ export class CarrerasComponent implements OnInit {
       this.clearForm();
       await this.loadCarreras();
     } catch (error) {
-      console.error('Error al crear carrera:', error);
       this.error = 'Error al crear la carrera';
     } finally {
       this.loading = false;
@@ -102,7 +100,6 @@ export class CarrerasComponent implements OnInit {
       this.success = 'Carrera eliminada correctamente';
       await this.loadCarreras();
     } catch (error) {
-      console.error('Error al eliminar carrera:', error);
       this.error = 'Error al eliminar la carrera';
     } finally {
       this.loading = false;

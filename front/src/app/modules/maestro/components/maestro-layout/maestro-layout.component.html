@@ -1,1 +1,39 @@
-<p>maestro-layout works!</p>
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav mode="side" opened class="sidenav">
+    <div class="sidebar-header">
+      <div class="user-info">
+        <div class="avatar">
+          {{ userName.charAt(0).toUpperCase() }}
+        </div>
+        <div class="user-details">
+          <span class="user-name" [title]="userName">{{ userName }}</span>
+          <span class="user-role">Maestro</span>
+        </div>
+      </div>
+    </div>
+    
+    <mat-nav-list>
+      <a mat-list-item routerLink="/maestro/dashboard" routerLinkActive="active">
+        <mat-icon matListItemIcon>calendar_today</mat-icon>
+        <span matListItemTitle>Mi Horario</span>
+      </a>
+      
+      <mat-divider></mat-divider>
+      
+      <a mat-list-item (click)="signOut()" class="signout-btn">
+        <mat-icon matListItemIcon>logout</mat-icon>
+        <span matListItemTitle>Cerrar Sesión</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+  
+  <mat-sidenav-content>
+    <mat-toolbar color="primary">
+      <span>Sistema de Checado - Maestro</span>
+    </mat-toolbar>
+    
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

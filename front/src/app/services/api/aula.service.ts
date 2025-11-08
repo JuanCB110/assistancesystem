@@ -15,7 +15,6 @@ export class AulaService {
       const result = await response.json();
       return result.data || [];
     } catch (error) {
-      console.error('Error al obtener aulas:', error);
       return [];
     }
   }
@@ -26,7 +25,6 @@ export class AulaService {
       const result = await response.json();
       return result.data || null;
     } catch (error) {
-      console.error('Error al obtener aula:', error);
       return null;
     }
   }
@@ -41,7 +39,6 @@ export class AulaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al crear aula:', error);
       throw error;
     }
   }
@@ -56,7 +53,6 @@ export class AulaService {
       const result = await response.json();
       return result.data;
     } catch (error) {
-      console.error('Error al actualizar aula:', error);
       throw error;
     }
   }
@@ -67,7 +63,6 @@ export class AulaService {
         method: 'DELETE'
       });
     } catch (error) {
-      console.error('Error al eliminar aula:', error);
       throw error;
     }
   }

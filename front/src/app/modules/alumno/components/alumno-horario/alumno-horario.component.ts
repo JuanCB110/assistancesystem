@@ -75,7 +75,10 @@ export class AlumnoHorarioComponent implements OnInit {
   ngOnInit() {
     // Establecer fecha de hoy
     const today = new Date();
-    this.selectedDate = today.toISOString().split('T')[0];
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    this.selectedDate = `${year}-${month}-${day}`;
     
     this.loadInitialData();
   }
@@ -87,8 +90,13 @@ export class AlumnoHorarioComponent implements OnInit {
   }
 
   getDiaSeleccionado(): string {
-    const fecha = new Date(this.selectedDate + 'T12:00:00');
-    return this.getDiaDeFecha(fecha);
+    const partes = this.selectedDate.split('-');
+    const year = parseInt(partes[0]);
+    const month = parseInt(partes[1]) - 1;
+    const day = parseInt(partes[2]);
+    const fecha = new Date(year, month, day);
+    const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+    return dias[fecha.getDay()];
   }
 
   async loadInitialData() {
@@ -105,7 +113,6 @@ export class AlumnoHorarioComponent implements OnInit {
       this.carreras = carreras;
     } catch (err: any) {
       this.error = 'Error al cargar datos iniciales';
-      console.error(err);
     } finally {
       this.loading = false;
     }
@@ -155,15 +162,12 @@ export class AlumnoHorarioComponent implements OnInit {
         horarios = [];
       }
 
-      console.log('Horarios cargados:', horarios);
-
       // Limpiar mapa
       this.horarioMap.clear();
 
       // Obtener día de la fecha seleccionada
       const fecha = new Date(this.selectedDate + 'T12:00:00');
       const diaSeleccionado = this.getDiaDeFecha(fecha);
-      console.log('Día seleccionado:', diaSeleccionado);
 
       // Llenar SOLO con datos de horarios del día seleccionado
       horarios?.forEach((horario: any) => {
@@ -173,8 +177,6 @@ export class AlumnoHorarioComponent implements OnInit {
           : Array.isArray(horario.dias) 
             ? horario.dias 
             : [horario.dias];
-
-        console.log('Días del horario:', diasArray);
 
         // Filtrar solo si incluye el día seleccionado
         if (diasArray.includes(diaSeleccionado)) {
@@ -196,8 +198,6 @@ export class AlumnoHorarioComponent implements OnInit {
         }
       });
 
-      console.log('Mapa de horarios:', this.horarioMap);
-
       // Cargar asistencias del maestro para la fecha seleccionada
       await this.loadAsistencias(horarios);
 
@@ -205,7 +205,6 @@ export class AlumnoHorarioComponent implements OnInit {
       setTimeout(() => this.success = null, 3000);
     } catch (err: any) {
       this.error = 'Error al cargar horario';
-      console.error(err);
     } finally {
       this.loading = false;
     }
@@ -245,7 +244,7 @@ export class AlumnoHorarioComponent implements OnInit {
         }
       });
     } catch (error) {
-      console.error('Error al cargar asistencias:', error);
+      // Error al cargar asistencias
     }
   }
 

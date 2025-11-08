@@ -1,1 +1,126 @@
-<p>maestro-dashboard works!</p>
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="page-header">
+    <h1>Mi Horario de Clases</h1>
+  </div>
+
+  <!-- Date Selector -->
+  <mat-card class="selector-card">
+    <mat-card-content>
+      <div class="date-controls">
+        <mat-form-field appearance="outline">
+          <mat-label>Fecha</mat-label>
+          <input 
+            matInput 
+            type="date" 
+            [(ngModel)]="selectedDate"
+            [max]="getToday()"
+            (change)="onDateChange()"
+          >
+        </mat-form-field>
+        
+        <button mat-raised-button color="primary" (click)="handleHoyClick()">
+          Hoy
+        </button>
+      </div>
+
+      <div *ngIf="diaActual" class="current-day">
+        {{ diaActual }}
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner [diameter]="50"></mat-spinner>
+  </div>
+
+  <!-- Classes List -->
+  <div *ngIf="!loading && diaActual && horasNecesarias.length > 0" class="classes-container">
+    <mat-card *ngFor="let hora of horasNecesarias" class="class-card">
+      <mat-card-content>
+        <ng-container *ngIf="getHorarioData(hora)?.materia; else noClass">
+          <div class="class-info">
+            <!-- Header with time and subject -->
+            <div class="class-header">
+              <span class="time">{{ formatHora(hora) }}</span>
+              <span class="subject">{{ getHorarioData(hora)?.materia }}</span>
+            </div>
+
+            <!-- Details in compact row -->
+            <div class="class-details">
+              <span class="detail">
+                <strong>Grupo:</strong> {{ getHorarioData(hora)?.grupo }}
+              </span>
+              <span *ngIf="getHorarioData(hora)?.aula" class="detail">
+                <strong>Aula:</strong> {{ getHorarioData(hora)?.aula }}
+              </span>
+              <span 
+                class="status-badge"
+                [ngClass]="{
+                  'status-presente': getHorarioData(hora)?.asistencia === 'Presente',
+                  'status-falta': getHorarioData(hora)?.asistencia === 'Falta',
+                  'status-retardo': getHorarioData(hora)?.asistencia === 'Retardo',
+                  'status-pendiente': getHorarioData(hora)?.asistencia === 'pendiente'
+                }"
+              >
+                {{ getHorarioData(hora)?.asistencia === 'pendiente' ? 'Sin registrar' : getHorarioData(hora)?.asistencia }}
+              </span>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+              <button 
+                mat-stroked-button 
+                [class.active]="getHorarioData(hora)?.asistencia === 'Presente'"
+                (click)="handleToggleAsistencia(diaActual, hora, 'Presente')"
+              >
+                Presente
+              </button>
+              
+              <button 
+                mat-stroked-button 
+                [class.active]="getHorarioData(hora)?.asistencia === 'Retardo'"
+                (click)="handleToggleAsistencia(diaActual, hora, 'Retardo')"
+              >
+                Retardo
+              </button>
+              
+              <button 
+                mat-stroked-button 
+                [class.active]="getHorarioData(hora)?.asistencia === 'Falta'"
+                (click)="handleToggleAsistencia(diaActual, hora, 'Falta')"
+              >
+                Falta
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-template #noClass>
+          <div class="no-class">
+            <span class="time">{{ formatHora(hora) }}</span>
+            <p>Sin clase asignada</p>
+          </div>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Empty States -->
+  <div *ngIf="!loading && !diaActual" class="empty-message">
+    <mat-card>
+      <mat-card-content>
+        <p>No hay clases los fines de semana</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div *ngIf="!loading && diaActual && horasNecesarias.length === 0" class="empty-message">
+    <mat-card>
+      <mat-card-content>
+        <p>No tienes clases programadas para {{ diaActual }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

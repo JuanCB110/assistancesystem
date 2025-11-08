@@ -1,5 +1,5 @@
 export const errorHandler = (err, req, res, next) => {
-  console.error('Error:', err);
+  // Error handler
 
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Error interno del servidor';
