@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://assistancesystem.onrender.com/api'
+  apiUrl: 'https://checador-backend-faf7.onrender.com'
 };
