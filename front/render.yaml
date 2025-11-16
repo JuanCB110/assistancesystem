@@ -1,0 +1,14 @@
+services:
+  # Frontend Angular
+  - type: web
+    name: checador-frontend
+    runtime: static
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist/front/browser
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

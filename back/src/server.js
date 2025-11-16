@@ -10,9 +10,26 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configurar orígenes permitidos para CORS
+const allowedOrigins = [
+  'http://localhost:4200',
+  'http://localhost:4201',
+  'http://localhost:4305',
+  process.env.FRONTEND_URL, // URL del frontend en producción
+].filter(Boolean); // Eliminar valores undefined
+
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:4200', 'http://localhost:4201', 'http://localhost:4305'],
+  origin: function (origin, callback) {
+    // Permitir requests sin origin (como mobile apps o curl)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      callback(new Error('No permitido por CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());

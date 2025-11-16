@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'http://localhost:3000/api'  // Backend Express.js (cambiar en producción)
+  apiUrl: 'https://checador-backend.onrender.com/api'  // Actualiza con tu URL de Render
 };
