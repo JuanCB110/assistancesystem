@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Aula } from '../../models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AulaService {
-  private apiUrl = 'http://localhost:3000/api/aulas';
+  private apiUrl = `${environment.apiUrl}/aulas`;
 
   constructor() {}
 

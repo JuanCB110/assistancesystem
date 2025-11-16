@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Materia } from '../../models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MateriaService {
-  private apiUrl = 'http://localhost:3000/api/materias';
+  private apiUrl = `${environment.apiUrl}/materias`;
 
   constructor() {}
 

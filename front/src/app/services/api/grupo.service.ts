@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Grupo } from '../../models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GrupoService {
-  private apiUrl = 'http://localhost:3000/api/grupos';
+  private apiUrl = `${environment.apiUrl}/grupos`;
 
   constructor() {}
 

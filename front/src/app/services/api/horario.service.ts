@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HorarioMaestro } from '../../models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HorarioService {
-  private apiUrl = 'http://localhost:3000/api/horarios';
+  private apiUrl = `${environment.apiUrl}/horarios`;
 
   constructor() {}
 
