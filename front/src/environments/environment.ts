@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api'  // Backend Express.js
+  apiUrl: 'https://checador-backend-faf7.onrender.com'  // Backend Express.js
 };
