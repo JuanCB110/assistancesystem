@@ -51,7 +51,7 @@ export class AuthService {
       'Jefe_de_Grupo': '/jefe/horario',
       'Jefe de Grupo': '/jefe/horario', // Variante con espacio
       'Checador': '/checador/control-asistencia',
-      'Maestro': '/maestro/dashboard'
+      'Profesor': '/maestro/dashboard'
     };
     
     const targetRoute = roleRoutes[normalizedRole];

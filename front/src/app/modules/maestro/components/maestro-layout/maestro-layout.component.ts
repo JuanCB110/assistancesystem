@@ -28,7 +28,7 @@ export class MaestroLayoutComponent {
 
   constructor(private authService: AuthService) {
     const user = this.authService.currentUser;
-    this.userName = user?.name || 'Maestro';
+    this.userName = user?.name || 'Profesor';
   }
 
   async signOut() {

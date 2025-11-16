@@ -4,10 +4,10 @@ export interface Usuario {
   name: string;
   email?: string;
   password?: string;
-  role?: 'Alumno' | 'Jefe de Grupo' | 'Checador' | 'Maestro' | 'Administrador';
+  role?: 'Alumno' | 'Jefe de Grupo' | 'Checador' | 'Profesor' | 'Administrador';
   numero_cuenta?: string;
   activo?: boolean;
   created_at?: string;
 }
 
-export type UserRole = 'Alumno' | 'Jefe de Grupo' | 'Checador' | 'Maestro' | 'Administrador';
+export type UserRole = 'Alumno' | 'Jefe de Grupo' | 'Checador' | 'Profesor' | 'Administrador';

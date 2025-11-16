@@ -81,13 +81,13 @@ export class ConsultaAsistenciasComponent implements OnInit {
     try {
       this.maestros = await this.usuarioService.getMaestros();
     } catch (error) {
-      this.error = 'Error al cargar maestros de la base de datos';
+      this.error = 'Error al cargar profesores de la base de datos';
     }
   }
 
   async consultarAsistencias() {
     if (!this.selectedMaestro) {
-      this.error = 'Por favor seleccione un maestro';
+      this.error = 'Por favor seleccione un profesor';
       return;
     }
 

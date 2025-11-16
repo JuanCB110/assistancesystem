@@ -12,7 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { UsuarioService } from '../../../../services/api/usuario.service';
 import { Usuario } from '../../../../models';
 
-export type UserRole = 'Alumno' | 'Jefe de Grupo' | 'Checador' | 'Maestro' | 'Administrador';
+export type UserRole = 'Alumno' | 'Jefe de Grupo' | 'Checador' | 'Profesor' | 'Administrador';
 
 @Component({
   selector: 'app-usuarios',
@@ -53,7 +53,7 @@ export class UsuariosComponent implements OnInit {
     'Alumno',
     'Jefe de Grupo',
     'Checador',
-    'Maestro',
+    'Profesor',
     'Administrador'
   ];
 

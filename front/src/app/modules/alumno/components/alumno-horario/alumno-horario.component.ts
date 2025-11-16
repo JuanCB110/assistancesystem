@@ -109,7 +109,7 @@ export class AlumnoHorarioComponent implements OnInit {
       ]);
 
       this.grupos = grupos;
-      this.maestros = usuarios.filter((u: Usuario) => u.role === 'Maestro');
+      this.maestros = usuarios.filter((u: Usuario) => u.role === 'Profesor');
       this.carreras = carreras;
     } catch (err: any) {
       this.error = 'Error al cargar datos iniciales';
@@ -198,7 +198,7 @@ export class AlumnoHorarioComponent implements OnInit {
         }
       });
 
-      // Cargar asistencias del maestro para la fecha seleccionada
+      // Cargar asistencias del profesor para la fecha seleccionada
       await this.loadAsistencias(horarios);
 
       this.success = 'Horario cargado correctamente';
@@ -224,7 +224,7 @@ export class AlumnoHorarioComponent implements OnInit {
       
       if (horarioIds.length === 0) return;
 
-      // Obtener todas las asistencias de maestro para la fecha seleccionada
+      // Obtener todas las asistencias de profesor para la fecha seleccionada
       const asistencias = await this.asistenciaService.getAsistenciasMaestro({
         fecha: this.selectedDate
       });

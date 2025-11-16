@@ -73,7 +73,7 @@
         <td mat-cell *matCellDef="let horario" class="cell-dia" [class.has-class]="horario.materia">
           <div class="horario-info">
             <div class="materia-nombre">{{ horario.materia }}</div>
-            <div class="maestro-info">Maestro: {{ horario.maestro }}</div>
+            <div class="maestro-info">Profesor: {{ horario.maestro }}</div>
             <div class="grupo-info">Grupo: {{ horario.grupo }}</div>
             <div *ngIf="horario.aula" class="ubicacion-info">
               Aula: {{ horario.aula }}

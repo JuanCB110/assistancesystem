@@ -119,7 +119,7 @@ export class MaestroDashboardComponent implements OnInit {
     try {
       this.loading = true;
       
-      // Obtener todos los horarios del maestro
+      // Obtener todos los horarios del profesor
       const todosHorarios = await this.horarioService.getByMaestro(this.maestroId);
       
       // Filtrar por día actual

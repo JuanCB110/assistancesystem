@@ -2,8 +2,8 @@
   <h2 class="page-title">Sistema de Asistencias</h2>
 
   <div class="maestro-info">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Seleccione al maestro</mat-label>
+    <mat-form-field appearance="outline" class="maestro-select">
+      <mat-label>Seleccione al profesor</mat-label>
       <mat-select [(value)]="selectedMaestro" (selectionChange)="onMaestroChange()">
         <mat-option *ngFor="let maestro of maestros" [value]="maestro.id">
           {{maestro.name}}
@@ -43,20 +43,20 @@
       <span>Asistencias: 
         <strong>{{weekStats.asistencias.checador}}</strong> (Checador) | 
         <strong>{{weekStats.asistencias.jefe}}</strong> (Jefe) | 
-        <strong>{{weekStats.asistencias.maestro}}</strong> (Maestro)
+        <strong>{{weekStats.asistencias.maestro}}</strong> (Profesor)
       </span>
     </div>
     <div class="stat-item error">
       <span>Faltas: 
         <strong>{{weekStats.faltas.checador}}</strong> (Checador) | 
         <strong>{{weekStats.faltas.jefe}}</strong> (Jefe) | 
-        <strong>{{weekStats.faltas.maestro}}</strong> (Maestro)
+        <strong>{{weekStats.faltas.maestro}}</strong> (Profesor)
       </span>
     </div>
   </div>
 
   <div class="horario-header">
-    <h3>HORARIO DEL MAESTRO</h3>
+    <h3>HORARIO DEL PROFESOR</h3>
   </div>
 
   <div *ngFor="let dia of diasSemana" class="day-section">
@@ -100,7 +100,7 @@
         </ng-container>
 
         <ng-container matColumnDef="maestro">
-          <th mat-header-cell *matHeaderCellDef>Maestro</th>
+          <th mat-header-cell *matHeaderCellDef>Profesor</th>
           <td mat-cell *matCellDef="let horario">
             <span [class]="'estado ' + getEstadoClass(getAsistenciaEstado(horario.id, 'maestro'))">
               {{getEstadoText(getAsistenciaEstado(horario.id, 'maestro'))}}
