@@ -1,112 +1,39 @@
 <div class="horarios-container">
-  <mat-card class="form-card">
-    <mat-card-header>
-      <mat-card-title>Gestión de Horarios</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="form-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>Profesor</mat-label>
-          <mat-select [(value)]="selectedMaestro">
-            <mat-option *ngFor="let maestro of maestros" [value]="maestro.id">
-              {{maestro.name}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+  <!-- Header con filtros y botón nuevo horario -->
+  <div class="header-section">
+    <div class="filters-row">
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filtrar por Carrera</mat-label>
+        <mat-select [(value)]="filtroCarrera" (selectionChange)="onCarreraFilterChange()">
+          <mat-option value="">Todas las carreras</mat-option>
+          <mat-option *ngFor="let carrera of carreras" [value]="carrera.id">
+            {{carrera.nombre}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Grupo</mat-label>
-          <mat-select [(value)]="selectedGrupo">
-            <mat-option *ngFor="let grupo of grupos" [value]="grupo.id">
-              {{grupo.name}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filtrar por Grupo</mat-label>
+        <mat-select [(value)]="filtroGrupo" [disabled]="!filtroCarrera">
+          <mat-option value="">Todos los grupos</mat-option>
+          <mat-option *ngFor="let grupo of gruposFiltrados" [value]="grupo.id">
+            {{grupo.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Materia</mat-label>
-          <mat-select [(value)]="selectedMateria">
-            <mat-option *ngFor="let materia of materias" [value]="materia.id">
-              {{materia.name}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+    <button mat-raised-button color="primary" (click)="openForm()">
+      <mat-icon>add_circle</mat-icon>
+      Nuevo Horario
+    </button>
+  </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Días de la semana</mat-label>
-          <mat-select [(value)]="selectedDias" multiple>
-            <mat-option *ngFor="let dia of diasSemana" [value]="dia">
-              {{dia}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Hora Inicio</mat-label>
-          <input matInput type="time" [(ngModel)]="horaInicio" name="horaInicio">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Hora Fin</mat-label>
-          <input matInput type="time" [(ngModel)]="horaFin" name="horaFin">
-        </mat-form-field>
-      </div>
-
-      <div class="button-section">
-        <button mat-raised-button color="primary" 
-                (click)="crearHorario()" 
-                [disabled]="loading">
-          <mat-icon *ngIf="!loading">add_circle</mat-icon>
-          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-          <span *ngIf="!loading">Crear Horario</span>
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card class="filter-card">
-    <mat-card-header>
-      <mat-card-title>Filtrar Horarios</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="filter-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>Filtrar por</mat-label>
-          <mat-select [(value)]="filtroTipo">
-            <mat-option value="carrera">Carrera</mat-option>
-            <mat-option value="maestro">Profesor</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" *ngIf="filtroTipo === 'carrera'">
-          <mat-label>Carrera</mat-label>
-          <mat-select [(value)]="filtroCarrera">
-            <mat-option *ngFor="let carrera of carreras" [value]="carrera.id">
-              {{carrera.nombre}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" *ngIf="filtroTipo === 'carrera'">
-          <mat-label>Grupo</mat-label>
-          <mat-select [(value)]="filtroGrupo">
-            <mat-option *ngFor="let grupo of gruposFiltrados" [value]="grupo.id">
-              {{grupo.name}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
+  <!-- Tabla de horarios -->
   <mat-card class="table-card">
-    <mat-card-header>
-      <mat-card-title>Horarios Existentes</mat-card-title>
-    </mat-card-header>
     <mat-card-content>
       <div class="table-container">
-        <table mat-table [dataSource]="horarios" class="horarios-table">
-
+        <table mat-table [dataSource]="horariosFiltrados" class="horarios-table">
           <ng-container matColumnDef="maestro">
             <th mat-header-cell *matHeaderCellDef>Profesor</th>
             <td mat-cell *matCellDef="let horario">{{getMaestroNombre(horario.maestro_id)}}</td>
@@ -122,8 +49,13 @@
             <td mat-cell *matCellDef="let horario">{{getGrupoNombre(horario.grupo_id)}}</td>
           </ng-container>
 
+          <ng-container matColumnDef="edificio">
+            <th mat-header-cell *matHeaderCellDef>Edificio</th>
+            <td mat-cell *matCellDef="let horario">{{getEdificioNombre(horario.grupo_id)}}</td>
+          </ng-container>
+
           <ng-container matColumnDef="aula">
-            <th mat-header-cell *matHeaderCellDef>Aula - Edificio</th>
+            <th mat-header-cell *matHeaderCellDef>Aula</th>
             <td mat-cell *matCellDef="let horario">{{getAulaInfo(horario.grupo_id)}}</td>
           </ng-container>
 
@@ -134,14 +66,25 @@
 
           <ng-container matColumnDef="hora">
             <th mat-header-cell *matHeaderCellDef>Horario</th>
-            <td mat-cell *matCellDef="let horario">{{horario.hora_inicio}} - {{horario.hora_fin}}</td>
+            <td mat-cell *matCellDef="let horario">
+              {{horario.hora_inicio?.substring(0, 5)}} - {{horario.hora_fin?.substring(0, 5)}}
+            </td>
           </ng-container>
 
           <ng-container matColumnDef="accion">
             <th mat-header-cell *matHeaderCellDef>Acciones</th>
             <td mat-cell *matCellDef="let horario">
-              <button mat-icon-button color="warn" (click)="eliminarHorario(horario)" matTooltip="Eliminar horario">
-                <mat-icon>delete_forever</mat-icon>
+              <button mat-icon-button 
+                      color="primary" 
+                      (click)="openForm(horario)"
+                      matTooltip="Editar horario">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button 
+                      color="warn" 
+                      (click)="confirmDelete(horario)" 
+                      matTooltip="Eliminar horario">
+                <mat-icon>delete</mat-icon>
               </button>
             </td>
           </ng-container>
@@ -149,18 +92,114 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
+
+        <div *ngIf="horariosFiltrados.length === 0" class="no-data">
+          <mat-icon>schedule</mat-icon>
+          <p>No hay horarios registrados</p>
+        </div>
+
+        <div *ngIf="loading" class="loading-overlay">
+          <mat-spinner></mat-spinner>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>
-</div>
 
-<div class="snackbar-container">
-  <div *ngIf="error" class="alert alert-danger">
-    {{error}}
-    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
-  </div>
-  <div *ngIf="success" class="alert alert-success">
-    {{success}}
-    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
+  <!-- Modal de formulario -->
+  <div class="form-overlay" *ngIf="showForm" (click)="closeForm()">
+    <mat-card class="form-modal" (click)="$event.stopPropagation()">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>{{isEditing ? 'edit' : 'add_circle'}}</mat-icon>
+          {{isEditing ? 'Editar Horario' : 'Nuevo Horario'}}
+        </mat-card-title>
+        <button mat-icon-button class="close-btn" (click)="closeForm()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form class="horario-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Profesor</mat-label>
+            <mat-select [(value)]="selectedMaestro">
+              <mat-option *ngFor="let maestro of maestros" [value]="maestro.id">
+                {{maestro.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Materia</mat-label>
+            <mat-select [(value)]="selectedMateria">
+              <mat-option *ngFor="let materia of materias" [value]="materia.id">
+                {{materia.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Grupo</mat-label>
+            <mat-select [(value)]="selectedGrupo">
+              <mat-option *ngFor="let grupo of grupos" [value]="grupo.id">
+                {{grupo.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Días de la semana</mat-label>
+            <mat-select [(value)]="selectedDias" multiple>
+              <mat-option *ngFor="let dia of diasSemana" [value]="dia">
+                {{dia}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <div class="time-row">
+            <mat-form-field appearance="outline" class="time-field">
+              <mat-label>Hora Inicio</mat-label>
+              <input matInput type="time" [(ngModel)]="horaInicio" name="horaInicio">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="ampm-field">
+              <mat-label>AM/PM</mat-label>
+              <mat-select [(value)]="ampm">
+                <mat-option value="AM">AM</mat-option>
+                <mat-option value="PM">PM</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="time-row">
+            <mat-form-field appearance="outline" class="time-field">
+              <mat-label>Hora Fin</mat-label>
+              <input matInput type="time" [(ngModel)]="horaFin" name="horaFin">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="ampm-field">
+              <mat-label>AM/PM</mat-label>
+              <mat-select [(value)]="ampmFin">
+                <mat-option value="AM">AM</mat-option>
+                <mat-option value="PM">PM</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="hint-text">
+            <mat-icon>info</mat-icon>
+            <span>La clase debe durar al menos 50 minutos</span>
+          </div>
+        </form>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button (click)="closeForm()">Cancelar</button>
+        <button mat-raised-button color="primary" (click)="crearHorario()" [disabled]="loading">
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          <span *ngIf="!loading">{{isEditing ? 'Actualizar' : 'Crear'}}</span>
+        </button>
+      </mat-card-actions>
+    </mat-card>
   </div>
 </div>

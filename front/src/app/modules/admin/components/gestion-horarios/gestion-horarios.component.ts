@@ -9,7 +9,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { HorarioService } from '../../../../services/api/horario.service';
+import { ToastService } from '../../../../services/toast.service';
 import { UsuarioService } from '../../../../services/api/usuario.service';
 import { MateriaService } from '../../../../services/api/materia.service';
 import { GrupoService } from '../../../../services/api/grupo.service';
@@ -29,7 +31,8 @@ import { HorarioMaestro, Usuario, Materia, Grupo, Carrera } from '../../../../mo
     MatButtonModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   templateUrl: './gestion-horarios.component.html',
   styleUrls: ['./gestion-horarios.component.css']
@@ -56,22 +59,27 @@ export class GestionHorariosComponent implements OnInit {
 
   // UI
   loading = false;
-  error: string | null = null;
-  success: string | null = null;
+  showForm = false;
+  isEditing = false;
+  selectedHorario: HorarioMaestro | null = null;
+
+  // 12-hour time format
+  ampm: 'AM' | 'PM' = 'AM';
+  ampmFin: 'AM' | 'PM' = 'AM';
 
   // Constantes
-  diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-  horasClase = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+  diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
   // Tabla
-  displayedColumns = ['maestro', 'materia', 'grupo', 'aula', 'dias', 'hora', 'accion'];
+  displayedColumns = ['maestro', 'materia', 'grupo', 'edificio', 'aula', 'dias', 'hora', 'accion'];
 
   constructor(
     private horarioService: HorarioService,
     private usuarioService: UsuarioService,
     private materiaService: MateriaService,
     private grupoService: GrupoService,
-    private carreraService: CarreraService
+    private carreraService: CarreraService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -87,7 +95,7 @@ export class GestionHorariosComponent implements OnInit {
       this.carreras = await this.carreraService.getAll();
       this.horarios = await this.horarioService.getAll();
     } catch (error) {
-      this.error = 'Error al cargar datos de la base de datos';
+      this.toastService.error('Error al cargar datos de la base de datos');
     } finally {
       this.loading = false;
     }
@@ -95,49 +103,132 @@ export class GestionHorariosComponent implements OnInit {
 
   // 🎭 Ya no necesario - datos estáticos cargados
 
+  convertTo24Hour(time12: string, ampm: 'AM' | 'PM'): string {
+    if (!time12) return '';
+    const [hours, minutes] = time12.split(':').map(Number);
+    let hours24 = hours;
+    
+    if (ampm === 'PM' && hours !== 12) {
+      hours24 = hours + 12;
+    } else if (ampm === 'AM' && hours === 12) {
+      hours24 = 0;
+    }
+    
+    return `${hours24.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+  }
+
+  openForm(horario?: HorarioMaestro) {
+    if (horario) {
+      this.isEditing = true;
+      this.selectedHorario = horario;
+      this.selectedMaestro = horario.maestro_id?.toString() || '';
+      this.selectedMateria = horario.materia_id?.toString() || '';
+      this.selectedGrupo = horario.grupo_id?.toString() || '';
+      this.selectedDias = horario.dias?.split(',').map(d => d.trim()) || [];
+      
+      // Convert 24-hour to 12-hour for display
+      if (horario.hora_inicio) {
+        const [horaInicio, ampmInicio] = this.convertTo12Hour(horario.hora_inicio);
+        this.horaInicio = horaInicio;
+        this.ampm = ampmInicio;
+      }
+      if (horario.hora_fin) {
+        const [horaFin, ampmFin] = this.convertTo12Hour(horario.hora_fin);
+        this.horaFin = horaFin;
+        this.ampmFin = ampmFin;
+      }
+    } else {
+      this.isEditing = false;
+      this.clearForm();
+    }
+    this.showForm = true;
+  }
+
+  convertTo12Hour(time24: string): [string, 'AM' | 'PM'] {
+    const [hours24, minutes] = time24.split(':').map(Number);
+    const ampm: 'AM' | 'PM' = hours24 >= 12 ? 'PM' : 'AM';
+    let hours12 = hours24 % 12;
+    if (hours12 === 0) hours12 = 12;
+    
+    return [`${hours12.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`, ampm];
+  }
+
+  closeForm() {
+    this.showForm = false;
+    this.clearForm();
+  }
+
   async crearHorario() {
+    // Validaciones
     if (!this.selectedMaestro || !this.selectedMateria || !this.selectedGrupo || 
         this.selectedDias.length === 0 || !this.horaInicio || !this.horaFin) {
-      this.error = 'Por favor complete todos los campos';
+      this.toastService.warning('Por favor complete todos los campos');
+      return;
+    }
+
+    // Convert to 24-hour format for validation and storage
+    const horaInicio24 = this.convertTo24Hour(this.horaInicio, this.ampm);
+    const horaFin24 = this.convertTo24Hour(this.horaFin, this.ampmFin);
+
+    // Validate end time > start time
+    const [horaInicioH, horaInicioM] = horaInicio24.split(':').map(Number);
+    const [horaFinH, horaFinM] = horaFin24.split(':').map(Number);
+    const inicioMinutos = horaInicioH * 60 + horaInicioM;
+    const finMinutos = horaFinH * 60 + horaFinM;
+    
+    if (finMinutos <= inicioMinutos) {
+      this.toastService.warning('La hora de fin debe ser mayor que la hora de inicio');
+      return;
+    }
+
+    // Validate duration >= 50 minutes
+    const duracion = finMinutos - inicioMinutos;
+    if (duracion < 50) {
+      this.toastService.warning('La duración de la clase debe ser de al menos 50 minutos');
       return;
     }
 
     // Validar que no haya conflictos de horarios
-    const conflicto = this.validarConflictoHorario();
+    const conflicto = this.validarConflictoHorario(horaInicio24, horaFin24);
     if (conflicto) {
-      this.error = conflicto;
+      this.toastService.error(conflicto);
       return;
     }
 
     this.loading = true;
-    this.error = null;
 
-    const nuevoHorario: HorarioMaestro = {
+    const horarioData: HorarioMaestro = {
       maestro_id: Number(this.selectedMaestro),
       materia_id: Number(this.selectedMateria),
       grupo_id: Number(this.selectedGrupo),
       dias: this.selectedDias.join(', '),
-      hora_inicio: this.horaInicio + ':00',  // Agregar segundos
-      hora_fin: this.horaFin + ':00'         // Agregar segundos
+      hora_inicio: horaInicio24 + ':00',  // Agregar segundos
+      hora_fin: horaFin24 + ':00'         // Agregar segundos
     };
 
     try {
-      await this.horarioService.create(nuevoHorario);
-      this.success = 'Horario creado correctamente';
-      this.clearForm();
+      if (this.isEditing && this.selectedHorario) {
+        await this.horarioService.update(this.selectedHorario.id!, horarioData);
+        this.toastService.success('Horario actualizado correctamente');
+      } else {
+        await this.horarioService.create(horarioData);
+        this.toastService.success('Horario creado correctamente');
+      }
+      
       await this.loadData();
+      this.closeForm();
     } catch (error) {
-      this.error = 'Error al crear los horarios';
+      this.toastService.error(this.isEditing ? 'Error al actualizar el horario' : 'Error al crear el horario');
     } finally {
       this.loading = false;
     }
   }
 
-  validarConflictoHorario(): string | null {
+  validarConflictoHorario(horaInicioNueva: string, horaFinNueva: string): string | null {
     const maestroId = Number(this.selectedMaestro);
     const grupoId = Number(this.selectedGrupo);
-    const horaInicioNueva = this.horaInicio + ':00';
-    const horaFinNueva = this.horaFin + ':00';
+    const horaInicio = horaInicioNueva + ':00';
+    const horaFin = horaFinNueva + ':00';
 
     // Verificar cada día seleccionado
     for (const dia of this.selectedDias) {
@@ -153,7 +244,8 @@ export class GestionHorariosComponent implements OnInit {
       const conflictoMaestro = horariosDelDia.find(h => 
         h.maestro_id === maestroId && 
         h.hora_inicio && h.hora_fin &&
-        this.hayInterseccionHoraria(h.hora_inicio, h.hora_fin, horaInicioNueva, horaFinNueva)
+        (!this.isEditing || h.id !== this.selectedHorario?.id) &&
+        this.hayInterseccionHoraria(h.hora_inicio, h.hora_fin, horaInicio, horaFin)
       );
 
       if (conflictoMaestro && conflictoMaestro.hora_inicio && conflictoMaestro.hora_fin) {
@@ -166,7 +258,8 @@ export class GestionHorariosComponent implements OnInit {
       const conflictoGrupo = horariosDelDia.find(h => 
         h.grupo_id === grupoId && 
         h.hora_inicio && h.hora_fin &&
-        this.hayInterseccionHoraria(h.hora_inicio, h.hora_fin, horaInicioNueva, horaFinNueva)
+        (!this.isEditing || h.id !== this.selectedHorario?.id) &&
+        this.hayInterseccionHoraria(h.hora_inicio, h.hora_fin, horaInicio, horaFin)
       );
 
       if (conflictoGrupo && conflictoGrupo.hora_inicio && conflictoGrupo.hora_fin) {
@@ -202,22 +295,27 @@ export class GestionHorariosComponent implements OnInit {
     );
   }
 
-  async eliminarHorario(horario: HorarioMaestro) {
-    if (!confirm('¿Está seguro de eliminar este horario?')) {
-      return;
+  confirmDelete(horario: HorarioMaestro) {
+    const maestro = this.getMaestroNombre(horario.maestro_id);
+    const materia = this.getMateriaNombre(horario.materia_id);
+    const grupo = this.getGrupoNombre(horario.grupo_id);
+    
+    if (confirm(`¿Está seguro de eliminar el horario de ${materia} para ${maestro} con ${grupo}?\n\nEsta acción no se puede deshacer.`)) {
+      this.eliminarHorario(horario);
     }
+  }
 
+  async eliminarHorario(horario: HorarioMaestro) {
     if (!horario.id) return;
 
     this.loading = true;
-    this.error = null;
 
     try {
       await this.horarioService.delete(horario.id);
-      this.success = 'Horario eliminado correctamente';
+      this.toastService.success('Horario eliminado correctamente');
       await this.loadData();
     } catch (error) {
-      this.error = 'Error al eliminar el horario';
+      this.toastService.error('Error al eliminar el horario');
     } finally {
       this.loading = false;
     }
@@ -230,6 +328,9 @@ export class GestionHorariosComponent implements OnInit {
     this.selectedDias = [];
     this.horaInicio = '';
     this.horaFin = '';
+    this.ampm = 'AM';
+    this.ampmFin = 'AM';
+    this.selectedHorario = null;
   }
 
   getMaestroNombre(maestroId?: number): string {
@@ -253,9 +354,18 @@ export class GestionHorariosComponent implements OnInit {
   getAulaInfo(grupoId?: number): string {
     if (!grupoId) return 'N/A';
     const grupo = this.grupos.find(g => g.id === grupoId);
-    if (!grupo?.aula) return 'N/A';
-    const edificio = grupo.aula.edificio?.nombre || '';
-    return `${grupo.aula.numero}${edificio ? ' - ' + edificio : ''}`;
+    return grupo?.aula?.numero || 'N/A';
+  }
+
+  getEdificioNombre(grupoId?: number): string {
+    if (!grupoId) return 'N/A';
+    const grupo = this.grupos.find(g => g.id === grupoId);
+    return grupo?.aula?.edificio?.nombre || 'N/A';
+  }
+
+  onCarreraFilterChange() {
+    // Auto-apply filter when carrera changes
+    this.filtroGrupo = '';
   }
 
   get gruposFiltrados(): Grupo[] {
@@ -265,8 +375,10 @@ export class GestionHorariosComponent implements OnInit {
     return this.grupos.filter(g => g.carrera_id === Number(this.filtroCarrera));
   }
 
-  handleCloseAlert() {
-    this.error = null;
-    this.success = null;
+  get horariosFiltrados(): HorarioMaestro[] {
+    if (!this.filtroGrupo) {
+      return this.horarios;
+    }
+    return this.horarios.filter(h => h.grupo_id === Number(this.filtroGrupo));
   }
 }

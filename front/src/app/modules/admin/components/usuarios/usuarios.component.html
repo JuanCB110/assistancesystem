@@ -1,135 +1,142 @@
 <div class="usuarios-container">
-  <mat-card class="tabs-card">
-    <mat-tab-group [(selectedIndex)]="tabValue" (selectedTabChange)="onTabChange($event)">
-      <mat-tab label="Agregar"></mat-tab>
-      <mat-tab label="Editar"></mat-tab>
-    </mat-tab-group>
-  </mat-card>
+  <!-- Header con búsqueda y botón nuevo usuario -->
+  <div class="header-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar usuario</mat-label>
+      <input matInput 
+             [(ngModel)]="searchTerm" 
+             (input)="filterUsuarios()" 
+             placeholder="Nombre, email o número de cuenta">
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
 
-  <mat-card *ngIf="tabValue === 0" class="form-card">
-    <mat-card-header>
-      <mat-card-title>Agregar nuevo usuario</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <form class="user-form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Rol</mat-label>
-          <mat-select [(value)]="role">
-            <mat-option *ngFor="let r of roles" [value]="r">{{r}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Número de Cuenta</mat-label>
-          <input matInput [(ngModel)]="numeroCuenta" name="numeroCuenta" required>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Nombre del usuario</mat-label>
-          <input matInput [(ngModel)]="userName" name="userName" required>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Correo Electrónico</mat-label>
-          <input matInput type="email" [(ngModel)]="email" name="email" required>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Contraseña</mat-label>
-          <input matInput type="password" [(ngModel)]="password" name="password" required>
-        </mat-form-field>
-
-        <button mat-raised-button color="primary" 
-                class="full-width submit-btn"
-                (click)="handleAddUser()" 
-                [disabled]="loading">
-          <mat-icon *ngIf="!loading">person_add</mat-icon>
-          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-          <span *ngIf="!loading">Crear usuario</span>
-        </button>
-      </form>
-    </mat-card-content>
-  </mat-card>
-
-  <mat-card *ngIf="tabValue === 1" class="form-card">
-    <mat-card-header>
-      <mat-card-title>Editar usuario</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="search-section">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Buscar por número de cuenta o ID</mat-label>
-          <input matInput [(ngModel)]="searchAccount" name="searchAccount">
-        </mat-form-field>
-        <button mat-raised-button color="primary" 
-                (click)="handleSearch()" 
-                [disabled]="loading"
-                class="search-btn">
-          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-          <span *ngIf="!loading">Buscar</span>
-        </button>
-      </div>
-
-      <form class="user-form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>ID</mat-label>
-          <input matInput [(ngModel)]="accountNumber" name="accountNumber" readonly>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Rol</mat-label>
-          <mat-select [(value)]="role" [disabled]="!selectedUser">
-            <mat-option *ngFor="let r of roles" [value]="r">{{r}}</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Número de cuenta</mat-label>
-          <input matInput [(ngModel)]="numeroCuenta" name="numeroCuenta" [disabled]="!selectedUser">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Nombre del usuario</mat-label>
-          <input matInput [(ngModel)]="userName" name="userName" [disabled]="!selectedUser">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Correo Electrónico</mat-label>
-          <input matInput type="email" [(ngModel)]="email" name="email" [disabled]="!selectedUser">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Contraseña</mat-label>
-          <input matInput type="password" [(ngModel)]="password" name="password" [disabled]="!selectedUser">
-          <mat-hint>Dejar en blanco para mantener la contraseña actual</mat-hint>
-        </mat-form-field>
-
-        <div class="button-group">
-          <button mat-raised-button color="warn" 
-                  (click)="handleDelete()" 
-                  [disabled]="!selectedUser || loading">
-            <mat-icon>delete_forever</mat-icon>
-            Eliminar
-          </button>
-          <button mat-raised-button color="primary" 
-                  (click)="handleSave()" 
-                  [disabled]="!selectedUser || loading">
-            <mat-icon>save</mat-icon>
-            Guardar
-          </button>
-        </div>
-      </form>
-    </mat-card-content>
-  </mat-card>
-</div>
-
-<div class="snackbar-container">
-  <div *ngIf="error" class="alert alert-danger" role="alert">
-    {{error}}
-    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
+    <button mat-raised-button color="primary" (click)="openForm()">
+      <mat-icon>person_add</mat-icon>
+      Nuevo Usuario
+    </button>
   </div>
-  <div *ngIf="success" class="alert alert-success" role="alert">
-    {{success}}
-    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
+
+  <!-- Tabla de usuarios -->
+  <mat-card class="table-card">
+    <mat-card-content>
+      <div class="table-container">
+        <table mat-table [dataSource]="usuariosFiltrados" class="usuarios-table">
+          <!-- Columna Nombre -->
+          <ng-container matColumnDef="nombre">
+            <th mat-header-cell *matHeaderCellDef>Nombre</th>
+            <td mat-cell *matCellDef="let usuario">{{usuario.name}}</td>
+          </ng-container>
+
+          <!-- Columna Email -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let usuario">{{usuario.email || '-'}}</td>
+          </ng-container>
+
+          <!-- Columna Rol -->
+          <ng-container matColumnDef="rol">
+            <th mat-header-cell *matHeaderCellDef>Rol</th>
+            <td mat-cell *matCellDef="let usuario">{{usuario.role}}</td>
+          </ng-container>
+
+          <!-- Columna Número de Cuenta -->
+          <ng-container matColumnDef="numero_cuenta">
+            <th mat-header-cell *matHeaderCellDef>Número de Cuenta</th>
+            <td mat-cell *matCellDef="let usuario">{{usuario.numero_cuenta || '-'}}</td>
+          </ng-container>
+
+          <!-- Columna Acciones -->
+          <ng-container matColumnDef="acciones">
+            <th mat-header-cell *matHeaderCellDef>Acciones</th>
+            <td mat-cell *matCellDef="let usuario">
+              <button mat-icon-button 
+                      color="primary" 
+                      (click)="openForm(usuario)"
+                      matTooltip="Editar usuario">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button 
+                      color="warn" 
+                      (click)="confirmDelete(usuario)"
+                      matTooltip="Eliminar usuario">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <div *ngIf="usuariosFiltrados.length === 0" class="no-data">
+          <mat-icon>person_off</mat-icon>
+          <p>No se encontraron usuarios</p>
+        </div>
+
+        <div *ngIf="loading" class="loading-overlay">
+          <mat-spinner></mat-spinner>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Modal de formulario -->
+  <div class="form-overlay" *ngIf="showForm" (click)="closeForm()">
+    <mat-card class="form-modal" (click)="$event.stopPropagation()">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>{{isEditing ? 'edit' : 'person_add'}}</mat-icon>
+          {{isEditing ? 'Editar Usuario' : 'Nuevo Usuario'}}
+        </mat-card-title>
+        <button mat-icon-button class="close-btn" (click)="closeForm()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form class="user-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre</mat-label>
+            <input matInput [(ngModel)]="userName" name="userName" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput type="email" [(ngModel)]="email" name="email" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Rol</mat-label>
+            <mat-select [(value)]="role">
+              <mat-option *ngFor="let r of roles" [value]="r">{{r}}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Número de Cuenta</mat-label>
+            <input matInput 
+                   [(ngModel)]="numeroCuenta" 
+                   name="numeroCuenta"
+                   (input)="validateNumeroCuenta($event)"
+                   placeholder="Solo números">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Contraseña</mat-label>
+            <input matInput type="password" [(ngModel)]="password" name="password">
+            <mat-hint *ngIf="isEditing">Dejar en blanco para mantener la actual</mat-hint>
+            <mat-hint *ngIf="!isEditing">Requerida para nuevos usuarios</mat-hint>
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button (click)="closeForm()">Cancelar</button>
+        <button mat-raised-button color="primary" (click)="saveUsuario()" [disabled]="loading">
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          <span *ngIf="!loading">{{isEditing ? 'Actualizar' : 'Crear'}}</span>
+        </button>
+      </mat-card-actions>
+    </mat-card>
   </div>
 </div>
