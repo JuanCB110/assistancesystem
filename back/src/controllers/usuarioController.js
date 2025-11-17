@@ -29,7 +29,7 @@ export const getMaestros = asyncHandler(async (req, res) => {
   const { data, error } = await supabase
     .from('usuarios')
     .select('id, name, email, role, numero_cuenta')
-    .eq('role', 'Maestro')
+    .eq('role', 'Profesor')
     .order('name');
 
   if (error) throw error;
