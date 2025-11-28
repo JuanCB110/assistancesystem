@@ -55,6 +55,7 @@
   letter-spacing: 0em;
   color: rgba(0, 0, 0, 0.87);
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  text-align: center;
 }
 
 .login-logo {
