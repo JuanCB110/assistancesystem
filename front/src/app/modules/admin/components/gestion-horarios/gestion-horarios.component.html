@@ -154,35 +154,15 @@
             </mat-select>
           </mat-form-field>
 
-          <div class="time-row">
-            <mat-form-field appearance="outline" class="time-field">
-              <mat-label>Hora Inicio</mat-label>
-              <input matInput type="time" [(ngModel)]="horaInicio" name="horaInicio">
-            </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Hora Inicio</mat-label>
+            <input matInput type="time" [(ngModel)]="horaInicio" name="horaInicio">
+          </mat-form-field>
 
-            <mat-form-field appearance="outline" class="ampm-field">
-              <mat-label>AM/PM</mat-label>
-              <mat-select [(value)]="ampm">
-                <mat-option value="AM">AM</mat-option>
-                <mat-option value="PM">PM</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
-
-          <div class="time-row">
-            <mat-form-field appearance="outline" class="time-field">
-              <mat-label>Hora Fin</mat-label>
-              <input matInput type="time" [(ngModel)]="horaFin" name="horaFin">
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="ampm-field">
-              <mat-label>AM/PM</mat-label>
-              <mat-select [(value)]="ampmFin">
-                <mat-option value="AM">AM</mat-option>
-                <mat-option value="PM">PM</mat-option>
-              </mat-select>
-            </mat-form-field>
-          </div>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Hora Fin</mat-label>
+            <input matInput type="time" [(ngModel)]="horaFin" name="horaFin">
+          </mat-form-field>
 
           <div class="hint-text">
             <mat-icon>info</mat-icon>

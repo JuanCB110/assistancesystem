@@ -63,10 +63,6 @@ export class GestionHorariosComponent implements OnInit {
   isEditing = false;
   selectedHorario: HorarioMaestro | null = null;
 
-  // 12-hour time format
-  ampm: 'AM' | 'PM' = 'AM';
-  ampmFin: 'AM' | 'PM' = 'AM';
-
   // Constantes
   diasSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
 
@@ -103,20 +99,6 @@ export class GestionHorariosComponent implements OnInit {
 
   // 🎭 Ya no necesario - datos estáticos cargados
 
-  convertTo24Hour(time12: string, ampm: 'AM' | 'PM'): string {
-    if (!time12) return '';
-    const [hours, minutes] = time12.split(':').map(Number);
-    let hours24 = hours;
-    
-    if (ampm === 'PM' && hours !== 12) {
-      hours24 = hours + 12;
-    } else if (ampm === 'AM' && hours === 12) {
-      hours24 = 0;
-    }
-    
-    return `${hours24.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-  }
-
   openForm(horario?: HorarioMaestro) {
     if (horario) {
       this.isEditing = true;
@@ -125,32 +107,13 @@ export class GestionHorariosComponent implements OnInit {
       this.selectedMateria = horario.materia_id?.toString() || '';
       this.selectedGrupo = horario.grupo_id?.toString() || '';
       this.selectedDias = horario.dias?.split(',').map(d => d.trim()) || [];
-      
-      // Convert 24-hour to 12-hour for display
-      if (horario.hora_inicio) {
-        const [horaInicio, ampmInicio] = this.convertTo12Hour(horario.hora_inicio);
-        this.horaInicio = horaInicio;
-        this.ampm = ampmInicio;
-      }
-      if (horario.hora_fin) {
-        const [horaFin, ampmFin] = this.convertTo12Hour(horario.hora_fin);
-        this.horaFin = horaFin;
-        this.ampmFin = ampmFin;
-      }
+      this.horaInicio = horario.hora_inicio?.substring(0, 5) || '';
+      this.horaFin = horario.hora_fin?.substring(0, 5) || '';
     } else {
       this.isEditing = false;
       this.clearForm();
     }
     this.showForm = true;
-  }
-
-  convertTo12Hour(time24: string): [string, 'AM' | 'PM'] {
-    const [hours24, minutes] = time24.split(':').map(Number);
-    const ampm: 'AM' | 'PM' = hours24 >= 12 ? 'PM' : 'AM';
-    let hours12 = hours24 % 12;
-    if (hours12 === 0) hours12 = 12;
-    
-    return [`${hours12.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`, ampm];
   }
 
   closeForm() {
@@ -166,13 +129,9 @@ export class GestionHorariosComponent implements OnInit {
       return;
     }
 
-    // Convert to 24-hour format for validation and storage
-    const horaInicio24 = this.convertTo24Hour(this.horaInicio, this.ampm);
-    const horaFin24 = this.convertTo24Hour(this.horaFin, this.ampmFin);
-
     // Validate end time > start time
-    const [horaInicioH, horaInicioM] = horaInicio24.split(':').map(Number);
-    const [horaFinH, horaFinM] = horaFin24.split(':').map(Number);
+    const [horaInicioH, horaInicioM] = this.horaInicio.split(':').map(Number);
+    const [horaFinH, horaFinM] = this.horaFin.split(':').map(Number);
     const inicioMinutos = horaInicioH * 60 + horaInicioM;
     const finMinutos = horaFinH * 60 + horaFinM;
     
@@ -189,7 +148,7 @@ export class GestionHorariosComponent implements OnInit {
     }
 
     // Validar que no haya conflictos de horarios
-    const conflicto = this.validarConflictoHorario(horaInicio24, horaFin24);
+    const conflicto = this.validarConflictoHorario(this.horaInicio, this.horaFin);
     if (conflicto) {
       this.toastService.error(conflicto);
       return;
@@ -202,8 +161,8 @@ export class GestionHorariosComponent implements OnInit {
       materia_id: Number(this.selectedMateria),
       grupo_id: Number(this.selectedGrupo),
       dias: this.selectedDias.join(', '),
-      hora_inicio: horaInicio24 + ':00',  // Agregar segundos
-      hora_fin: horaFin24 + ':00'         // Agregar segundos
+      hora_inicio: this.horaInicio,
+      hora_fin: this.horaFin
     };
 
     try {
