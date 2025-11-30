@@ -11,7 +11,6 @@ import { AdminLayoutComponent } from './components/admin-layout/admin-layout.com
 import { AdminSidebarComponent } from './components/admin-sidebar/admin-sidebar.component';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { GestionHorariosComponent } from './components/gestion-horarios/gestion-horarios.component';
-import { ConsultaHorariosComponent } from './components/consulta-horarios/consulta-horarios.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { GruposComponent } from './components/grupos/grupos.component';
 import { MateriasComponent } from './components/materias/materias.component';
@@ -34,7 +33,6 @@ import { ConsultaAsistenciasComponent } from './components/consulta-asistencias/
     AdminSidebarComponent,
     AdminDashboardComponent,
     GestionHorariosComponent,
-    ConsultaHorariosComponent,
     UsuariosComponent,
     GruposComponent,
     MateriasComponent,
