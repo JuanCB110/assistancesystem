@@ -287,8 +287,6 @@ export class GestionHorariosComponent implements OnInit {
     this.selectedDias = [];
     this.horaInicio = '';
     this.horaFin = '';
-    this.ampm = 'AM';
-    this.ampmFin = 'AM';
     this.selectedHorario = null;
   }
 
