@@ -33,14 +33,12 @@ export class AdminSidebarComponent implements OnInit {
   userName = 'Admin';
 
   menuItems: MenuItem[] = [
-    { text: 'Dashboard', icon: 'fa-tachometer-alt', path: '/admin/dashboard' },
-    { text: 'Gestión de Horarios', icon: 'fa-calendar-alt', path: '/admin/horarios' },
-    { text: 'Consulta de Horarios', icon: 'fa-clock', path: '/admin/horario' },
+    { text: 'Panel Principal', icon: 'fa-tachometer-alt', path: '/admin/dashboard' },
+    { text: 'Horarios', icon: 'fa-calendar-alt', path: '/admin/horarios' },
     { text: 'Grupos', icon: 'fa-users', path: '/admin/grupos' },
     { text: 'Usuarios', icon: 'fa-user', path: '/admin/usuarios' },
     { text: 'Materias', icon: 'fa-book', path: '/admin/materias' },
     { text: 'Carreras', icon: 'fa-graduation-cap', path: '/admin/carreras' },
-    // { text: 'Temario', icon: 'fa-bookmark', path: '/admin/temarios' },
     { text: 'Edificios', icon: 'fa-building', path: '/admin/edificios' },
     { text: 'Aulas', icon: 'fa-door-open', path: '/admin/aulas' },
     { text: 'Consulta de Asistencias', icon: 'fa-clipboard-check', path: '/admin/consulta-asistencias' }

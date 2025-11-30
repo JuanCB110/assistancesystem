@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 import { AdminLayoutComponent } from './components/admin-layout/admin-layout.component';
 import { AdminDashboardComponent } from './components/admin-dashboard/admin-dashboard.component';
 import { GestionHorariosComponent } from './components/gestion-horarios/gestion-horarios.component';
-import { ConsultaHorariosComponent } from './components/consulta-horarios/consulta-horarios.component';
 import { UsuariosComponent } from './components/usuarios/usuarios.component';
 import { GruposComponent } from './components/grupos/grupos.component';
 import { MateriasComponent } from './components/materias/materias.component';
@@ -20,7 +19,6 @@ const routes: Routes = [
     children: [
       { path: 'dashboard', component: AdminDashboardComponent },
       { path: 'horarios', component: GestionHorariosComponent },
-      { path: 'horario', component: ConsultaHorariosComponent },
       { path: 'usuarios', component: UsuariosComponent },
       { path: 'grupos', component: GruposComponent },
       { path: 'materias', component: MateriasComponent },

@@ -3,7 +3,6 @@
   <div class="header-section">
     <div class="filters-row">
       <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Filtrar por Carrera</mat-label>
         <mat-select [(value)]="filtroCarrera" (selectionChange)="onCarreraFilterChange()">
           <mat-option value="">Todas las carreras</mat-option>
           <mat-option *ngFor="let carrera of carreras" [value]="carrera.id">
@@ -13,7 +12,6 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="filter-field">
-        <mat-label>Filtrar por Grupo</mat-label>
         <mat-select [(value)]="filtroGrupo" [disabled]="!filtroCarrera">
           <mat-option value="">Todos los grupos</mat-option>
           <mat-option *ngFor="let grupo of gruposFiltrados" [value]="grupo.id">
@@ -25,7 +23,7 @@
 
     <button mat-raised-button color="primary" (click)="openForm()">
       <mat-icon>add_circle</mat-icon>
-      Nuevo Horario
+      Nuevo
     </button>
   </div>
 
