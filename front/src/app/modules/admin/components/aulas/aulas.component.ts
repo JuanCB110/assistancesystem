@@ -144,21 +144,16 @@ export class AulasComponent implements OnInit {
   }
 
   async eliminarAula(aula: Aula) {
-    if (!confirm('¿Está seguro de eliminar esta aula?')) {
-      return;
-    }
-
     if (!aula.id) return;
 
     this.loading = true;
-    this.error = null;
 
     try {
       await this.aulaService.delete(aula.id);
-      this.success = 'Aula eliminada correctamente';
+      this.toastService.show('Aula eliminada correctamente', 'success');
       await this.loadAulas();
     } catch (error) {
-      this.error = 'Error al eliminar el aula';
+      this.toastService.show('Error al eliminar el aula', 'error');
     } finally {
       this.loading = false;
     }
