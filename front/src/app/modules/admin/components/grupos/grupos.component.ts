@@ -9,7 +9,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { GrupoService } from '../../../../services/api/grupo.service';
+import { ToastService } from '../../../../services/toast.service';
 import { CarreraService } from '../../../../services/api/carrera.service';
 import { EdificioService } from '../../../../services/api/edificio.service';
 import { AulaService } from '../../../../services/api/aula.service';
@@ -29,13 +31,15 @@ import { Grupo, Carrera, Edificio, Aula, Usuario } from '../../../../models';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   templateUrl: './grupos.component.html',
   styleUrls: ['./grupos.component.css']
 })
 export class GruposComponent implements OnInit {
   grupos: Grupo[] = [];
+  gruposFiltrados: Grupo[] = [];
   carreras: Carrera[] = [];
   jefes: Usuario[] = [];
   edificios: Edificio[] = [];
@@ -45,20 +49,23 @@ export class GruposComponent implements OnInit {
   newGroup = '';
   selectedCarrera = '';
   selectedJefe = '';
-  selectedAula = ''; // String porque aula_id es VARCHAR en BD
+  selectedAula = '';
+  selectedGrupo: Grupo | null = null;
   
   // UI
   loading = false;
-  error: string | null = null;
-  success: string | null = null;
-  displayedColumns = ['nombre', 'carrera', 'jefe', 'aula', 'edificio', 'accion'];
+  showForm = false;
+  isEditing = false;
+  searchTerm = '';
+  displayedColumns = ['nombre', 'carrera', 'jefe', 'aula', 'edificio', 'acciones'];
 
   constructor(
     private grupoService: GrupoService,
     private carreraService: CarreraService,
     private edificioService: EdificioService,
     private aulaService: AulaService,
-    private usuarioService: UsuarioService
+    private usuarioService: UsuarioService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -71,11 +78,11 @@ export class GruposComponent implements OnInit {
 
   async loadGrupos() {
     this.loading = true;
-    this.error = null;
     try {
       this.grupos = await this.grupoService.getAll();
+      this.gruposFiltrados = [...this.grupos];
     } catch (error) {
-      this.error = 'Error al cargar los grupos de la base de datos';
+      this.toastService.error('Error al cargar los grupos');
     } finally {
       this.loading = false;
     }
@@ -113,50 +120,90 @@ export class GruposComponent implements OnInit {
     }
   }
 
+  filterGrupos() {
+    if (!this.searchTerm.trim()) {
+      this.gruposFiltrados = [...this.grupos];
+      return;
+    }
+
+    const term = this.searchTerm.toLowerCase();
+    this.gruposFiltrados = this.grupos.filter(g => 
+      g.name.toLowerCase().includes(term) ||
+      this.getCarreraNombre(g.carrera_id).toLowerCase().includes(term) ||
+      this.getJefeNombre(g.jefe_id).toLowerCase().includes(term)
+    );
+  }
+
+  openForm(grupo?: Grupo) {
+    if (grupo) {
+      this.isEditing = true;
+      this.selectedGrupo = grupo;
+      this.newGroup = grupo.name;
+      this.selectedCarrera = grupo.carrera_id?.toString() || '';
+      this.selectedJefe = grupo.jefe_id?.toString() || '';
+      this.selectedAula = grupo.aula_id?.toString() || '';
+    } else {
+      this.isEditing = false;
+      this.clearForm();
+    }
+    this.showForm = true;
+  }
+
+  closeForm() {
+    this.showForm = false;
+    this.clearForm();
+  }
+
   async crearGrupo() {
     if (!this.newGroup || !this.selectedCarrera || !this.selectedJefe || !this.selectedAula) {
-      this.error = 'Por favor complete todos los campos';
+      this.toastService.warning('Por favor complete todos los campos');
       return;
     }
 
     this.loading = true;
-    this.error = null;
 
-    const nuevoGrupo: Grupo = {
+    const grupoData: Grupo = {
       name: this.newGroup,
       carrera_id: Number(this.selectedCarrera),
-      jefe_id: Number(this.selectedJefe),  // Ahora es ID numérico
-      aula_id: Number(this.selectedAula) // String, como en la BD
+      jefe_id: Number(this.selectedJefe),
+      aula_id: Number(this.selectedAula)
     };
 
     try {
-      await this.grupoService.create(nuevoGrupo);
-      this.success = 'Grupo creado correctamente';
-      this.clearForm();
+      if (this.isEditing && this.selectedGrupo) {
+        await this.grupoService.update(this.selectedGrupo.id!, grupoData);
+        this.toastService.success('Grupo actualizado correctamente');
+      } else {
+        await this.grupoService.create(grupoData);
+        this.toastService.success('Grupo creado correctamente');
+      }
+      
       await this.loadGrupos();
+      this.closeForm();
     } catch (error) {
-      this.error = 'Error al crear el grupo';
+      this.toastService.error(this.isEditing ? 'Error al actualizar el grupo' : 'Error al crear el grupo');
     } finally {
       this.loading = false;
     }
   }
 
-  async eliminarGrupo(grupo: Grupo) {
-    if (!confirm('¿Está seguro de eliminar este grupo?')) {
-      return;
+  confirmDelete(grupo: Grupo) {
+    if (confirm(`¿Está seguro de eliminar el grupo "${grupo.name}"?\n\nEsta acción no se puede deshacer.`)) {
+      this.eliminarGrupo(grupo);
     }
+  }
 
+  async eliminarGrupo(grupo: Grupo) {
     if (!grupo.id) return;
 
     this.loading = true;
-    this.error = null;
 
     try {
       await this.grupoService.delete(grupo.id);
-      this.success = 'Grupo eliminado correctamente';
+      this.toastService.success('Grupo eliminado correctamente');
       await this.loadGrupos();
     } catch (error) {
-      this.error = 'Error al eliminar el grupo';
+      this.toastService.error('Error al eliminar el grupo');
     } finally {
       this.loading = false;
     }
@@ -200,10 +247,6 @@ export class GruposComponent implements OnInit {
     this.selectedCarrera = '';
     this.selectedJefe = '';
     this.selectedAula = '';
-  }
-
-  handleCloseAlert() {
-    this.error = null;
-    this.success = null;
+    this.selectedGrupo = null;
   }
 }

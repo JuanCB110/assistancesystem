@@ -9,8 +9,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { CarreraService } from '../../../../services/api/carrera.service';
 import { Carrera } from '../../../../models';
+import { ToastService } from '../../../../services/toast.service';
 
 @Component({
   selector: 'app-carreras',
@@ -25,23 +27,30 @@ import { Carrera } from '../../../../models';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   templateUrl: './carreras.component.html',
   styleUrls: ['./carreras.component.css']
 })
 export class CarrerasComponent implements OnInit {
   carreras: Carrera[] = [];
+  carrerasFiltradas: Carrera[] = [];
   newCarrera = '';
   duracion = '';
+  showForm = false;
+  isEditing = false;
+  searchTerm = '';
+  selectedCarrera: Carrera | null = null;
 
   loading = false;
-  error: string | null = null;
-  success: string | null = null;
 
   displayedColumns = ['nombre', 'duracion', 'acciones'];
 
-  constructor(private carreraService: CarreraService) { }
+  constructor(
+    private carreraService: CarreraService,
+    private toastService: ToastService
+  ) { }
 
   ngOnInit() {
     this.loadCarreras();
@@ -49,58 +58,91 @@ export class CarrerasComponent implements OnInit {
 
   async loadCarreras() {
     this.loading = true;
-    this.error = null;
     try {
       this.carreras = await this.carreraService.getAll();
+      this.carrerasFiltradas = [...this.carreras];
     } catch (error) {
-      this.error = 'Error al cargar las carreras de la base de datos';
+      this.toastService.show('Error al cargar las carreras', 'error');
     } finally {
       this.loading = false;
     }
   }
 
+  filterCarreras() {
+    const term = this.searchTerm.toLowerCase();
+    this.carrerasFiltradas = this.carreras.filter(c =>
+      c.nombre?.toLowerCase().includes(term)
+    );
+  }
+
+  openForm(carrera?: Carrera) {
+    if (carrera) {
+      this.isEditing = true;
+      this.selectedCarrera = carrera;
+      this.newCarrera = carrera.nombre || '';
+      this.duracion = carrera.semestres?.toString() || '';
+    } else {
+      this.isEditing = false;
+      this.selectedCarrera = null;
+      this.clearForm();
+    }
+    this.showForm = true;
+  }
+
+  closeForm() {
+    this.showForm = false;
+    this.isEditing = false;
+    this.selectedCarrera = null;
+    this.clearForm();
+  }
+
   async crearCarrera() {
     if (!this.newCarrera) {
-      this.error = 'Por favor complete el nombre de la carrera';
+      this.toastService.show('Por favor complete el nombre de la carrera', 'warning');
       return;
     }
 
     this.loading = true;
-    this.error = null;
 
-    const nuevaCarrera: Carrera = {
+    const carreraData: Carrera = {
       nombre: this.newCarrera,
       semestres: this.duracion ? Number(this.duracion) : undefined
     };
 
     try {
-      await this.carreraService.create(nuevaCarrera);
-      this.success = 'Carrera creada correctamente';
-      this.clearForm();
+      if (this.isEditing && this.selectedCarrera?.id) {
+        await this.carreraService.update(this.selectedCarrera.id, carreraData);
+        this.toastService.show('Carrera actualizada correctamente', 'success');
+      } else {
+        await this.carreraService.create(carreraData);
+        this.toastService.show('Carrera creada correctamente', 'success');
+      }
+      this.closeForm();
       await this.loadCarreras();
     } catch (error) {
-      this.error = 'Error al crear la carrera';
+      this.toastService.show(`Error al ${this.isEditing ? 'actualizar' : 'crear'} la carrera`, 'error');
     } finally {
       this.loading = false;
     }
   }
 
-  async eliminarCarrera(carrera: Carrera) {
-    if (!confirm('¿Está seguro de eliminar esta carrera?')) {
-      return;
+  confirmDelete(carrera: Carrera) {
+    if (confirm(`¿Está seguro de eliminar la carrera "${carrera.nombre}"?`)) {
+      this.eliminarCarrera(carrera);
     }
+  }
 
+  async eliminarCarrera(carrera: Carrera) {
     if (!carrera.id) return;
 
     this.loading = true;
-    this.error = null;
 
     try {
       await this.carreraService.delete(carrera.id);
-      this.success = 'Carrera eliminada correctamente';
+      this.toastService.show('Carrera eliminada correctamente', 'success');
       await this.loadCarreras();
     } catch (error) {
-      this.error = 'Error al eliminar la carrera';
+      this.toastService.show('Error al eliminar la carrera', 'error');
     } finally {
       this.loading = false;
     }
@@ -109,10 +151,6 @@ export class CarrerasComponent implements OnInit {
   clearForm() {
     this.newCarrera = '';
     this.duracion = '';
-  }
-
-  handleCloseAlert() {
-    this.error = null;
-    this.success = null;
+    this.selectedCarrera = null;
   }
 }

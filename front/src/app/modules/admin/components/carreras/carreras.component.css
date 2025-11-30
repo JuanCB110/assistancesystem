@@ -1,21 +1,160 @@
 .carreras-container {
   padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-.form-card {
-  padding: 32px;
-  max-width: 800px;
-  margin: 0 auto;
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  gap: 16px;
+}
+
+.search-field {
+  flex: 1;
+  max-width: 400px;
+}
+
+.table-card {
+  margin-bottom: 16px;
+}
+
+.table-container {
+  position: relative;
+  overflow-x: auto;
+}
+
+.carreras-table {
+  width: 100%;
+}
+
+.carreras-table th {
+  font-weight: 600;
+  background-color: #f5f5f5;
+}
+
+.carreras-table td, .carreras-table th {
+  padding: 12px 16px;
+}
+
+.no-data {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: #999;
+}
+
+.no-data mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.form-modal {
+  width: 100%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.form-modal mat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.form-modal mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 20px;
+}
+
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.form-modal mat-card-content {
+  padding: 24px;
+}
+
+.carrera-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .full-width {
   width: 100%;
-  margin: 16px 0;
 }
 
-.button-section {
+.form-modal mat-card-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+}
+
+@media (max-width: 768px) {
+  .carreras-container {
+    padding: 16px;
+  }
+
+  .header-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-field {
+    max-width: none;
+  }
+
+  .form-overlay {
+    padding: 0;
+  }
+
+  .form-modal {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+  }
 }

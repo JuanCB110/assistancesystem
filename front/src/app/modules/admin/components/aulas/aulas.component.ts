@@ -9,9 +9,11 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AulaService } from '../../../../services/api/aula.service';
 import { EdificioService } from '../../../../services/api/edificio.service';
 import { Aula, Edificio } from '../../../../models';
+import { ToastService } from '../../../../services/toast.service';
 
 @Component({
   selector: 'app-aulas',
@@ -26,24 +28,29 @@ import { Aula, Edificio } from '../../../../models';
     MatProgressSpinnerModule,
     MatTableModule,
     MatIconModule,
-    MatSelectModule
+    MatSelectModule,
+    MatTooltipModule
   ],
   templateUrl: './aulas.component.html',
   styleUrls: ['./aulas.component.css']
 })
 export class AulasComponent implements OnInit {
   aulas: Aula[] = [];
+  aulasFiltradas: Aula[] = [];
   edificios: Edificio[] = [];
   newAula = '';
-  selectedEdificio = '';
+  selectedEdificioId = '';
+  showForm = false;
+  isEditing = false;
+  searchTerm = '';
+  selectedAula: Aula | null = null;
   loading = false;
-  error: string | null = null;
-  success: string | null = null;
   displayedColumns = ['numero', 'edificio', 'acciones'];
 
   constructor(
     private aulaService: AulaService,
-    private edificioService: EdificioService
+    private edificioService: EdificioService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -61,39 +68,78 @@ export class AulasComponent implements OnInit {
 
   async loadAulas() {
     this.loading = true;
-    this.error = null;
     try {
       this.aulas = await this.aulaService.getAll();
+      this.aulasFiltradas = [...this.aulas];
     } catch (error) {
-      this.error = 'Error al cargar las aulas de la base de datos';
+      this.toastService.show('Error al cargar las aulas', 'error');
     } finally {
       this.loading = false;
     }
   }
 
+  filterAulas() {
+    const term = this.searchTerm.toLowerCase();
+    this.aulasFiltradas = this.aulas.filter(a =>
+      a.numero?.toLowerCase().includes(term) ||
+      this.getEdificioNombre(a.edificio_id).toLowerCase().includes(term)
+    );
+  }
+
+  openForm(aula?: Aula) {
+    if (aula) {
+      this.isEditing = true;
+      this.selectedAula = aula;
+      this.newAula = aula.numero || '';
+      this.selectedEdificioId = aula.edificio_id?.toString() || '';
+    } else {
+      this.isEditing = false;
+      this.selectedAula = null;
+      this.clearForm();
+    }
+    this.showForm = true;
+  }
+
+  closeForm() {
+    this.showForm = false;
+    this.isEditing = false;
+    this.selectedAula = null;
+    this.clearForm();
+  }
+
   async crearAula() {
-    if (!this.newAula || !this.selectedEdificio) {
-      this.error = 'Por favor complete todos los campos';
+    if (!this.newAula || !this.selectedEdificioId) {
+      this.toastService.show('Por favor complete todos los campos', 'warning');
       return;
     }
 
     this.loading = true;
-    this.error = null;
 
-    const nuevaAula: Aula = {
+    const aulaData: Aula = {
       numero: this.newAula,
-      edificio_id: Number(this.selectedEdificio)
+      edificio_id: Number(this.selectedEdificioId)
     };
 
     try {
-      await this.aulaService.create(nuevaAula);
-      this.success = 'Aula creada correctamente';
-      this.clearForm();
+      if (this.isEditing && this.selectedAula?.id) {
+        await this.aulaService.update(this.selectedAula.id, aulaData);
+        this.toastService.show('Aula actualizada correctamente', 'success');
+      } else {
+        await this.aulaService.create(aulaData);
+        this.toastService.show('Aula creada correctamente', 'success');
+      }
+      this.closeForm();
       await this.loadAulas();
     } catch (error) {
-      this.error = 'Error al crear el aula';
+      this.toastService.show(`Error al ${this.isEditing ? 'actualizar' : 'crear'} el aula`, 'error');
     } finally {
       this.loading = false;
+    }
+  }
+
+  confirmDelete(aula: Aula) {
+    if (confirm(`¿Está seguro de eliminar el aula "${aula.numero}"?`)) {
+      this.eliminarAula(aula);
     }
   }
 

@@ -9,7 +9,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MateriaService } from '../../../../services/api/materia.service';
+import { ToastService } from '../../../../services/toast.service';
 import { CarreraService } from '../../../../services/api/carrera.service';
 import { Materia, Carrera } from '../../../../models';
 
@@ -26,29 +28,34 @@ import { Materia, Carrera } from '../../../../models';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatTableModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   templateUrl: './materias.component.html',
   styleUrls: ['./materias.component.css']
 })
 export class MateriasComponent implements OnInit {
   materias: Materia[] = [];
+  materiasFiltradas: Materia[] = [];
   carreras: Carrera[] = [];
 
   newMateria = '';
   selectedCarrera = '';
   selectedSemestre = '';
+  selectedMateria: Materia | null = null;
 
   loading = false;
-  error: string | null = null;
-  success: string | null = null;
+  showForm = false;
+  isEditing = false;
+  searchTerm = '';
 
   semestres: number[] = [];
   displayedColumns = ['nombre', 'carrera', 'semestre', 'acciones'];
 
   constructor(
     private materiaService: MateriaService,
-    private carreraService: CarreraService
+    private carreraService: CarreraService,
+    private toastService: ToastService
   ) { }
 
   ngOnInit() {
@@ -58,11 +65,11 @@ export class MateriasComponent implements OnInit {
 
   async loadMaterias() {
     this.loading = true;
-    this.error = null;
     try {
       this.materias = await this.materiaService.getAll();
+      this.materiasFiltradas = [...this.materias];
     } catch (error) {
-      this.error = 'Error al cargar las materias de la base de datos';
+      this.toastService.error('Error al cargar las materias');
     } finally {
       this.loading = false;
     }
@@ -76,49 +83,88 @@ export class MateriasComponent implements OnInit {
     }
   }
 
+  filterMaterias() {
+    if (!this.searchTerm.trim()) {
+      this.materiasFiltradas = [...this.materias];
+      return;
+    }
+
+    const term = this.searchTerm.toLowerCase();
+    this.materiasFiltradas = this.materias.filter(m => 
+      m.name.toLowerCase().includes(term) ||
+      this.getCarreraNombre(m.carrera_id).toLowerCase().includes(term)
+    );
+  }
+
+  openForm(materia?: Materia) {
+    if (materia) {
+      this.isEditing = true;
+      this.selectedMateria = materia;
+      this.newMateria = materia.name;
+      this.selectedCarrera = materia.carrera_id?.toString() || '';
+      this.selectedSemestre = materia.semestre?.toString() || '';
+      this.onCarreraChange();
+    } else {
+      this.isEditing = false;
+      this.clearForm();
+    }
+    this.showForm = true;
+  }
+
+  closeForm() {
+    this.showForm = false;
+    this.clearForm();
+  }
+
   async crearMateria() {
     if (!this.newMateria || !this.selectedCarrera) {
-      this.error = 'Por favor complete el nombre y la carrera';
+      this.toastService.warning('Por favor complete el nombre y la carrera');
       return;
     }
 
     this.loading = true;
-    this.error = null;
 
-    const nuevaMateria: Materia = {
+    const materiaData: Materia = {
       name: this.newMateria,
       carrera_id: Number(this.selectedCarrera),
       semestre: this.selectedSemestre ? Number(this.selectedSemestre) : undefined
     };
 
     try {
-      await this.materiaService.create(nuevaMateria);
-      this.success = 'Materia creada correctamente';
-      this.clearForm();
+      if (this.isEditing && this.selectedMateria) {
+        await this.materiaService.update(this.selectedMateria.id!, materiaData);
+        this.toastService.success('Materia actualizada correctamente');
+      } else {
+        await this.materiaService.create(materiaData);
+        this.toastService.success('Materia creada correctamente');
+      }
+      
       await this.loadMaterias();
+      this.closeForm();
     } catch (error) {
-      this.error = 'Error al crear la materia';
+      this.toastService.error(this.isEditing ? 'Error al actualizar la materia' : 'Error al crear la materia');
     } finally {
       this.loading = false;
     }
   }
 
-  async eliminarMateria(materia: Materia) {
-    if (!confirm('¿Está seguro de eliminar esta materia?')) {
-      return;
+  confirmDelete(materia: Materia) {
+    if (confirm(`¿Está seguro de eliminar la materia "${materia.name}"?\n\nEsta acción no se puede deshacer.`)) {
+      this.eliminarMateria(materia);
     }
+  }
 
+  async eliminarMateria(materia: Materia) {
     if (!materia.id) return;
 
     this.loading = true;
-    this.error = null;
 
     try {
       await this.materiaService.delete(materia.id);
-      this.success = 'Materia eliminada correctamente';
+      this.toastService.success('Materia eliminada correctamente');
       await this.loadMaterias();
     } catch (error) {
-      this.error = 'Error al eliminar la materia';
+      this.toastService.error('Error al eliminar la materia');
     } finally {
       this.loading = false;
     }
@@ -129,6 +175,7 @@ export class MateriasComponent implements OnInit {
     this.selectedCarrera = '';
     this.selectedSemestre = '';
     this.semestres = [];
+    this.selectedMateria = null;
   }
 
   onCarreraChange() {
@@ -147,10 +194,5 @@ export class MateriasComponent implements OnInit {
     if (!carreraId) return 'N/A';
     const carrera = this.carreras.find(c => c.id === carreraId);
     return carrera?.nombre || 'N/A';
-  }
-
-  handleCloseAlert() {
-    this.error = null;
-    this.success = null;
   }
 }

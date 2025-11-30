@@ -1,62 +1,26 @@
 <div class="grupos-container">
-  <mat-card class="form-card">
-    <mat-card-header>
-      <mat-card-title>Grupos</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="form-grid">
-        <mat-form-field appearance="outline">
-          <mat-label>Nombre del Grupo</mat-label>
-          <input matInput [(ngModel)]="newGroup" name="newGroup">
-        </mat-form-field>
+  <!-- Header con búsqueda y botón nuevo grupo -->
+  <div class="header-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Buscar grupo</mat-label>
+      <input matInput 
+             [(ngModel)]="searchTerm" 
+             (input)="filterGrupos()" 
+             placeholder="Nombre, carrera o jefe">
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Carrera</mat-label>
-          <mat-select [(value)]="selectedCarrera">
-            <mat-option *ngFor="let carrera of carreras" [value]="carrera.id">
-              {{carrera.nombre}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+    <button mat-raised-button color="primary" (click)="openForm()">
+      <mat-icon>group_add</mat-icon>
+      Nuevo
+    </button>
+  </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Jefe de Grupo</mat-label>
-          <mat-select [(value)]="selectedJefe">
-            <mat-option *ngFor="let jefe of jefes" [value]="jefe.id">
-              {{jefe.name}} - {{jefe.numero_cuenta}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Aula</mat-label>
-          <mat-select [(value)]="selectedAula">
-            <mat-option *ngFor="let aula of aulas" [value]="aula.id">
-              {{aula.numero}} - {{getEdificioNombreByAula(aula.edificio_id)}}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="button-section">
-        <button mat-raised-button color="primary" 
-                (click)="crearGrupo()" 
-                [disabled]="loading">
-          <mat-icon *ngIf="!loading">group_add</mat-icon>
-          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
-          <span *ngIf="!loading">Nuevo</span>
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
+  <!-- Tabla de grupos -->
   <mat-card class="table-card">
-    <mat-card-header>
-      <mat-card-title>Grupos Existentes</mat-card-title>
-    </mat-card-header>
     <mat-card-content>
       <div class="table-container">
-        <table mat-table [dataSource]="grupos" class="grupos-table">
+        <table mat-table [dataSource]="gruposFiltrados" class="grupos-table">
           <ng-container matColumnDef="nombre">
             <th mat-header-cell *matHeaderCellDef>Nombre</th>
             <td mat-cell *matCellDef="let grupo">{{grupo.name}}</td>
@@ -82,11 +46,20 @@
             <td mat-cell *matCellDef="let grupo">{{getEdificioNombre(grupo.aula_id)}}</td>
           </ng-container>
 
-          <ng-container matColumnDef="accion">
+          <ng-container matColumnDef="acciones">
             <th mat-header-cell *matHeaderCellDef>Acciones</th>
             <td mat-cell *matCellDef="let grupo">
-              <button mat-icon-button color="warn" (click)="eliminarGrupo(grupo)" matTooltip="Eliminar grupo">
-                <mat-icon>delete_forever</mat-icon>
+              <button mat-icon-button 
+                      color="primary" 
+                      (click)="openForm(grupo)"
+                      matTooltip="Editar grupo">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button 
+                      color="warn" 
+                      (click)="confirmDelete(grupo)"
+                      matTooltip="Eliminar grupo">
+                <mat-icon>delete</mat-icon>
               </button>
             </td>
           </ng-container>
@@ -94,18 +67,75 @@
           <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
           <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
         </table>
+
+        <div *ngIf="gruposFiltrados.length === 0" class="no-data">
+          <mat-icon>groups</mat-icon>
+          <p>No se encontraron grupos</p>
+        </div>
+
+        <div *ngIf="loading" class="loading-overlay">
+          <mat-spinner></mat-spinner>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>
-</div>
 
-<div class="snackbar-container">
-  <div *ngIf="error" class="alert alert-danger">
-    {{error}}
-    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
-  </div>
-  <div *ngIf="success" class="alert alert-success">
-    {{success}}
-    <button type="button" class="btn-close" (click)="handleCloseAlert()"></button>
+  <!-- Modal de formulario -->
+  <div class="form-overlay" *ngIf="showForm" (click)="closeForm()">
+    <mat-card class="form-modal" (click)="$event.stopPropagation()">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>{{isEditing ? 'edit' : 'group_add'}}</mat-icon>
+          {{isEditing ? 'Editar Grupo' : 'Nuevo Grupo'}}
+        </mat-card-title>
+        <button mat-icon-button class="close-btn" (click)="closeForm()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-card-header>
+
+      <mat-card-content>
+        <form class="grupo-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nombre del Grupo</mat-label>
+            <input matInput [(ngModel)]="newGroup" name="newGroup" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Carrera</mat-label>
+            <mat-select [(value)]="selectedCarrera">
+              <mat-option *ngFor="let carrera of carreras" [value]="carrera.id">
+                {{carrera.nombre}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Jefe de Grupo</mat-label>
+            <mat-select [(value)]="selectedJefe">
+              <mat-option *ngFor="let jefe of jefes" [value]="jefe.id">
+                {{jefe.name}} - {{jefe.numero_cuenta}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Aula</mat-label>
+            <mat-select [(value)]="selectedAula">
+              <mat-option *ngFor="let aula of aulas" [value]="aula.id">
+                {{aula.numero}} - {{getEdificioNombreByAula(aula.edificio_id)}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-button (click)="closeForm()">Cancelar</button>
+        <button mat-raised-button color="primary" (click)="crearGrupo()" [disabled]="loading">
+          <mat-spinner *ngIf="loading" diameter="20"></mat-spinner>
+          <span *ngIf="!loading">{{isEditing ? 'Actualizar' : 'Crear'}}</span>
+        </button>
+      </mat-card-actions>
+    </mat-card>
   </div>
 </div>
