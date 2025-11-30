@@ -166,17 +166,13 @@ export class AulasComponent implements OnInit {
 
   clearForm() {
     this.newAula = '';
-    this.selectedEdificio = '';
+    this.selectedEdificioId = '';
+    this.selectedAula = null;
   }
 
   getEdificioNombre(edificioId?: number): string {
     if (!edificioId) return 'N/A';
     const edificio = this.edificios.find(e => e.id === edificioId);
     return edificio?.nombre || 'N/A';
-  }
-
-  handleCloseAlert() {
-    this.error = null;
-    this.success = null;
   }
 }

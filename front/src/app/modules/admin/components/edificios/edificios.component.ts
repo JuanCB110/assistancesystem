@@ -146,10 +146,3 @@ export class EdificiosComponent implements OnInit {
     this.selectedEdificio = null;
   }
 }
-  }
-
-  handleCloseAlert() {
-    this.error = null;
-    this.success = null;
-  }
-}
