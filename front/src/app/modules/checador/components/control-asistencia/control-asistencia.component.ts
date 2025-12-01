@@ -62,6 +62,7 @@ export class ControlAsistenciaComponent implements OnInit {
   aulas: Aula[] = [];
   selectedEdificio: number | null = null;
   selectedAula: string = '';
+  selectedHora: string = '';
 
   HORAS = ['07:00', '08:00', '09:00', '10:00', '11:00', '12:00', 
            '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
@@ -189,6 +190,15 @@ export class ControlAsistenciaComponent implements OnInit {
         horariosFiltrados = horariosFiltrados.filter(h => {
           const edificioId = h.grupo?.aula?.edificio_id;
           return edificioId === this.selectedEdificio;
+        });
+      }
+
+      // Filtrar por hora si está seleccionada
+      if (this.selectedHora) {
+        horariosFiltrados = horariosFiltrados.filter(h => {
+          if (!h.hora_inicio) return false;
+          const horaInicio = h.hora_inicio.substring(0, 5);
+          return horaInicio === this.selectedHora;
         });
       }
 

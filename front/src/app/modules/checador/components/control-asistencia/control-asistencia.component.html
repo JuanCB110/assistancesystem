@@ -25,6 +25,16 @@
       <!-- Filtros de Ubicación -->
       <div class="filtros">
         <mat-form-field appearance="outline">
+          <mat-label>Hora</mat-label>
+          <mat-select [(ngModel)]="selectedHora" (selectionChange)="cargarHorarios()">
+            <mat-option value="">Todas las horas</mat-option>
+            <mat-option *ngFor="let hora of HORAS" [value]="hora">
+              {{ hora }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
           <mat-label>Edificio</mat-label>
           <mat-select [(ngModel)]="selectedEdificio" (selectionChange)="onEdificioChange()">
             <mat-option [value]="null">Todos los edificios</mat-option>
