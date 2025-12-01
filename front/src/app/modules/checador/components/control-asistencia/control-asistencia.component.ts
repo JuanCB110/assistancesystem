@@ -198,8 +198,10 @@ export class ControlAsistenciaComponent implements OnInit {
       if (this.selectedHora) {
         horariosFiltrados = horariosFiltrados.filter(h => {
           if (!h.hora_inicio) return false;
-          const horaInicio = h.hora_inicio.substring(0, 5);
-          return horaInicio === this.selectedHora;
+          const horaInicio = h.hora_inicio.substring(0, 5); // HH:MM
+          // Si selectedHora es solo hora (HH:MM), comparar exactamente
+          // Esto permite filtrar 15:00, 15:10, 15:59, etc.
+          return horaInicio.startsWith(this.selectedHora) || horaInicio === this.selectedHora;
         });
       }
 
