@@ -1,25 +1,12 @@
 <div class="horario-container">
-  <mat-card class="header-card">
-    <mat-card-header>
-      <mat-card-title class="title-center">Registro de Asistencia</mat-card-title>
-    </mat-card-header>
-  </mat-card>
-
   <mat-card class="date-selector-card">
     <mat-card-content>
-      <div class="date-controls">
-        <mat-form-field appearance="outline">
-          <mat-label>Seleccionar fecha</mat-label>
-          <input 
-            matInput 
-            type="date" 
-            [(ngModel)]="selectedDate"
-            (change)="onDateChange()"
-            [max]="maxDate">
-        </mat-form-field>
-        <button mat-raised-button color="primary" (click)="setHoy()">
-          HOY
-        </button>
+      <div class="date-display-header">
+        <h2>Horario del {{ diaActual }}</h2>
+        <div class="fecha-actual">
+          <span class="date-label">Fecha:</span>
+          <span class="date-value">{{ selectedDate }}</span>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>
@@ -71,8 +58,7 @@
             <div class="botones-asistencia">
               <button 
                 mat-raised-button 
-                color="primary"
-                [class.selected]="horario.asistencia === 'Presente'"
+                [class.active]="horario.asistencia === 'Presente'"
                 (click)="handleToggleAsistencia(horario.dia, horario.hora_inicio, 'Presente')"
                 class="btn-presente"
               >
@@ -80,8 +66,7 @@
               </button>
               <button 
                 mat-raised-button 
-                color="warn"
-                [class.selected]="horario.asistencia === 'Falta'"
+                [class.active]="horario.asistencia === 'Falta'"
                 (click)="handleToggleAsistencia(horario.dia, horario.hora_inicio, 'Falta')"
                 class="btn-ausente"
               >
@@ -89,8 +74,7 @@
               </button>
               <button 
                 mat-raised-button 
-                color="accent"
-                [class.selected]="horario.asistencia === 'Retardo'"
+                [class.active]="horario.asistencia === 'Retardo'"
                 (click)="handleToggleAsistencia(horario.dia, horario.hora_inicio, 'Retardo')"
                 class="btn-retardo"
               >

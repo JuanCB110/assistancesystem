@@ -47,7 +47,6 @@ export class JefeHorarioComponent implements OnInit {
   grupoInfo: { name: string; aula: string; edificio: string } | null = null;
   diaActual = '';
   selectedDate = '';
-  maxDate = '';
   horasNecesarias: string[] = [];
   
   displayedColumns = ['hora', 'dia'];
@@ -74,8 +73,8 @@ export class JefeHorarioComponent implements OnInit {
       return;
     }
     
+    // Solo mostrar la fecha actual
     this.selectedDate = this.getToday();
-    this.maxDate = this.getToday();
     this.updateDiaActual();
     this.cargarHorarios();
   }
@@ -238,15 +237,6 @@ export class JefeHorarioComponent implements OnInit {
     } finally {
       this.loading = false;
     }
-  }
-
-  onDateChange() {
-    this.cargarHorarios();
-  }
-
-  setHoy() {
-    this.selectedDate = this.getToday();
-    this.cargarHorarios();
   }
 
   formatHora(hora: string): string {

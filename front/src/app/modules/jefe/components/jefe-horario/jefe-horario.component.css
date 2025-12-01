@@ -24,21 +24,37 @@
   background: white;
 }
 
-.date-controls {
+.date-display-header {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.date-display-header h2 {
+  color: #1e3a8a;
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+}
+
+.fecha-actual {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 1.1rem;
 }
 
-.date-controls mat-form-field {
-  width: 220px;
-}
-
-.date-controls button {
-  height: 56px;
+.date-label {
   font-weight: 600;
+  color: #374151;
+}
+
+.date-value {
+  color: #1e3a8a;
+  font-weight: 700;
+  background: #f3f4f6;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
 }
 
 .info-card {
@@ -171,21 +187,32 @@
 .botones-asistencia button {
   min-width: 100px;
   font-weight: 600;
+  background: white !important;
+  color: #374151 !important;
+  border: 2px solid #d1d5db !important;
+  transition: all 0.2s ease;
 }
 
-.btn-presente.selected {
-  background-color: #047857 !important;
-  color: white !important;
+.botones-asistencia button:hover {
+  border-color: #9ca3af !important;
 }
 
-.btn-ausente.selected {
-  background-color: #dc2626 !important;
+.btn-presente.active {
+  background: #22c55e !important;
   color: white !important;
+  border-color: #22c55e !important;
 }
 
-.btn-retardo.selected {
-  background-color: #ea580c !important;
+.btn-ausente.active {
+  background: #ef4444 !important;
   color: white !important;
+  border-color: #ef4444 !important;
+}
+
+.btn-retardo.active {
+  background: #f59e0b !important;
+  color: white !important;
+  border-color: #f59e0b !important;
 }
 
 .sin-clase {
@@ -276,18 +303,14 @@
     padding: 1rem;
   }
 
-  .title-center {
-    font-size: 1.5rem;
+  .date-display-header h2 {
+    font-size: 1.25rem;
   }
 
-  .date-controls {
+  .fecha-actual {
+    font-size: 1rem;
     flex-direction: column;
-    align-items: stretch;
-  }
-
-  .date-controls mat-form-field,
-  .date-controls button {
-    width: 100%;
+    gap: 0.25rem;
   }
 
   .cell-hora {
