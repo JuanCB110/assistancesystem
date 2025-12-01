@@ -198,10 +198,15 @@ export class ControlAsistenciaComponent implements OnInit {
       if (this.selectedHora) {
         horariosFiltrados = horariosFiltrados.filter(h => {
           if (!h.hora_inicio) return false;
-          const horaInicio = h.hora_inicio.substring(0, 5); // HH:MM
-          // Si selectedHora es solo hora (HH:MM), comparar exactamente
-          // Esto permite filtrar 15:00, 15:10, 15:59, etc.
-          return horaInicio.startsWith(this.selectedHora) || horaInicio === this.selectedHora;
+          const horaInicio = h.hora_inicio.substring(0, 5); // HH:MM del horario
+          const selectedHoraStr = this.selectedHora.substring(0, 5); // HH:MM del filtro
+          
+          // Comparar solo las primeras 2 posiciones (la hora, sin minutos)
+          // Ejemplo: si selectedHora es "15:00", comparar "15" con los primeros 2 chars de horaInicio
+          const horaFiltro = selectedHoraStr.substring(0, 2); // "15"
+          const horaHorario = horaInicio.substring(0, 2); // "15" de "15:30"
+          
+          return horaHorario === horaFiltro;
         });
       }
 
@@ -233,7 +238,8 @@ export class ControlAsistenciaComponent implements OnInit {
         const asistenciaHoy = asistenciasDia.find(a => a.horario_id === horario.id);
         const horaKey_inicio = horario.hora_inicio ? horario.hora_inicio.substring(0, 5) : '';
         const horaKey_fin =horario.hora_fin ? horario.hora_fin.substring(0, 5) : '';
-        const key = `${this.diaActual}-${horaKey_inicio}`;
+        // Usar el ID del horario para hacer la clave única
+        const key = `${this.diaActual}-${horaKey_inicio}-${horario.id}`;
         
         const grupoData = horario.grupo && 'name' in horario.grupo ? horario.grupo : null;
         const usuarioData = horario.usuario && ('nombre' in horario.usuario || 'name' in horario.usuario) ? horario.usuario : null;
@@ -266,8 +272,17 @@ export class ControlAsistenciaComponent implements OnInit {
   }
 
   async handleToggleAsistencia(dia: string, hora: string, nuevoEstado: 'Presente' | 'Falta' | 'Retardo') {
-    const key = `${dia}-${hora}`;
-    const horario = this.horarioData.get(key);
+    // Buscar el horario por dia, hora y otros datos
+    let horario: HorarioData | undefined;
+    let key: string = '';
+    
+    for (const [k, v] of this.horarioData.entries()) {
+      if (v.dia === dia && v.hora_inicio === hora) {
+        horario = v;
+        key = k;
+        break;
+      }
+    }
     
     if (!horario?.horarioId || !this.checadorId) return;
 
@@ -323,12 +338,9 @@ export class ControlAsistenciaComponent implements OnInit {
   }
 
   getHorarioArray(): HorarioData[] {
-    const result = this.horasNecesarias.map(hora => {
-      const key = `${this.diaActual}-${hora}`;
-      return this.horarioData.get(key);
-    }).filter(h => h !== undefined) as HorarioData[];
-    
-    return result;
+    // Devolver todos los valores del Map ordenados por hora
+    return Array.from(this.horarioData.values())
+      .sort((a, b) => a.hora_inicio.localeCompare(b.hora_inicio));
   }
 
   showError(message: string) {
