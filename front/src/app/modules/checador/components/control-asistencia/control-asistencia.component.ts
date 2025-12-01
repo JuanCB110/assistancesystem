@@ -72,7 +72,8 @@ export class ControlAsistenciaComponent implements OnInit {
     2: 'Martes',
     3: 'Miércoles',
     4: 'Jueves',
-    5: 'Viernes'
+    5: 'Viernes',
+    6: 'Sábado',
   };
 
   constructor(
@@ -120,7 +121,7 @@ export class ControlAsistenciaComponent implements OnInit {
     const diaSemana = selectedDateObj.getDay();
     
     if (diaSemana === 0 || diaSemana === 6) {
-      this.showError('No hay clases los fines de semana');
+      this.showError('No hay clases los domingos');
       this.diaActual = '';
       this.horarioData.clear();
       return;
