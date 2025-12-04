@@ -6,7 +6,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
 import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
@@ -16,6 +16,18 @@ import { HorarioService } from '../../../../services/api/horario.service';
 import { Asistencia, Usuario, HorarioMaestro } from '../../../../models';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+
+export const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMM YYYY',
+    dateA11yLabel: 'DD/MM/YYYY',
+    monthYearA11yLabel: 'MMMM YYYY',
+  },
+};
 
 @Component({
   selector: 'app-consulta-asistencias',
@@ -32,6 +44,10 @@ import autoTable from 'jspdf-autotable';
     MatTableModule,
     MatProgressSpinnerModule,
     MatIconModule
+  ],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS }
   ],
   templateUrl: './consulta-asistencias.component.html',
   styleUrls: ['./consulta-asistencias.component.css']
@@ -233,8 +249,11 @@ export class ConsultaAsistenciasComponent implements OnInit {
     });
   }
 
-  getAsistenciaEstado(horarioId?: number, tipo: 'checador' | 'jefe' | 'maestro' = 'checador'): string {
+  getAsistenciaEstado(horarioId?: number, tipo: 'checador' | 'jefe' | 'maestro' = 'checador', dia?: string): string {
     if (!horarioId) return 'Sin registro';
+    
+    // Calcular la fecha específica del día en la semana seleccionada
+    const fechaDia = this.getFechaDelDia(dia || '');
     
     // Mapear el tipo correctamente
     const tipoMap: any = {
@@ -245,12 +264,39 @@ export class ConsultaAsistenciasComponent implements OnInit {
     
     const asistencia = this.asistencias.find(a => 
       a.horario_id === horarioId && 
-      tipoMap[tipo].includes(a.tipo_asistencia)
+      tipoMap[tipo].includes(a.tipo_asistencia) &&
+      a.fecha === fechaDia
     );
     
     if (!asistencia) return 'Sin registro';
     
     return asistencia.asistencia || 'Sin registro';
+  }
+
+  // Obtener la fecha específica del día en la semana seleccionada
+  getFechaDelDia(dia: string): string {
+    const diasMap: { [key: string]: number } = {
+      'Lunes': 1,
+      'Martes': 2,
+      'Miércoles': 3,
+      'Jueves': 4,
+      'Viernes': 5
+    };
+
+    const startOfWeek = new Date(this.selectedDate);
+    const dayOfWeek = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+    startOfWeek.setDate(diff);
+
+    // Agregar días según el día solicitado
+    const targetDay = diasMap[dia] || 1;
+    const targetDate = new Date(startOfWeek);
+    targetDate.setDate(startOfWeek.getDate() + (targetDay - 1));
+
+    const year = targetDate.getFullYear();
+    const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const day = String(targetDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   onMaestroChange() {
@@ -416,9 +462,9 @@ export class ConsultaAsistenciasComponent implements OnInit {
           `${horario.hora_inicio} - ${horario.hora_fin}`,
           horario.materia?.name || 'N/A',
           horario.grupo?.name || 'N/A',
-          this.getEstadoText(this.getAsistenciaEstado(horario.id, 'checador')),
-          this.getEstadoText(this.getAsistenciaEstado(horario.id, 'jefe')),
-          this.getEstadoText(this.getAsistenciaEstado(horario.id, 'maestro'))
+          this.getEstadoText(this.getAsistenciaEstado(horario.id, 'checador', dia.nombre)),
+          this.getEstadoText(this.getAsistenciaEstado(horario.id, 'jefe', dia.nombre)),
+          this.getEstadoText(this.getAsistenciaEstado(horario.id, 'maestro', dia.nombre))
         ]);
 
         autoTable(doc, {

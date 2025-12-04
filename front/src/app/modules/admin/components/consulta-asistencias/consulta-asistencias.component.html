@@ -94,8 +94,8 @@
         <ng-container matColumnDef="checador">
           <th mat-header-cell *matHeaderCellDef>Checador</th>
           <td mat-cell *matCellDef="let horario">
-            <span [class]="'estado ' + getEstadoClass(getAsistenciaEstado(horario.id, 'checador'))">
-              {{getEstadoText(getAsistenciaEstado(horario.id, 'checador'))}}
+            <span [class]="'estado ' + getEstadoClass(getAsistenciaEstado(horario.id, 'checador', dia.nombre))">
+              {{getEstadoText(getAsistenciaEstado(horario.id, 'checador', dia.nombre))}}
             </span>
           </td>
         </ng-container>
@@ -103,8 +103,8 @@
         <ng-container matColumnDef="jefe">
           <th mat-header-cell *matHeaderCellDef>Jefe de Grupo</th>
           <td mat-cell *matCellDef="let horario">
-            <span [class]="'estado ' + getEstadoClass(getAsistenciaEstado(horario.id, 'jefe'))">
-              {{getEstadoText(getAsistenciaEstado(horario.id, 'jefe'))}}
+            <span [class]="'estado ' + getEstadoClass(getAsistenciaEstado(horario.id, 'jefe', dia.nombre))">
+              {{getEstadoText(getAsistenciaEstado(horario.id, 'jefe', dia.nombre))}}
             </span>
           </td>
         </ng-container>
@@ -112,8 +112,8 @@
         <ng-container matColumnDef="maestro">
           <th mat-header-cell *matHeaderCellDef>Profesor</th>
           <td mat-cell *matCellDef="let horario">
-            <span [class]="'estado ' + getEstadoClass(getAsistenciaEstado(horario.id, 'maestro'))">
-              {{getEstadoText(getAsistenciaEstado(horario.id, 'maestro'))}}
+            <span [class]="'estado ' + getEstadoClass(getAsistenciaEstado(horario.id, 'maestro', dia.nombre))">
+              {{getEstadoText(getAsistenciaEstado(horario.id, 'maestro', dia.nombre))}}
             </span>
           </td>
         </ng-container>
