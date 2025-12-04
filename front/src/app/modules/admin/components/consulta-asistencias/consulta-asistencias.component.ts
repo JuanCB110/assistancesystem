@@ -439,14 +439,14 @@ export class ConsultaAsistenciasComponent implements OnInit {
     });
 
     // Obtener la posición Y después de la tabla de estadísticas
-    const finalY = (doc as any).lastAutoTable.finalY || 110;
+    const statsTableEndY = (doc as any).lastAutoTable.finalY || 110;
 
     // Detalle por día
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('Detalle por Día', 20, finalY + 15);
+    doc.text('Detalle por Día', 20, statsTableEndY + 15);
 
-    let currentY = finalY + 22;
+    let currentY = statsTableEndY + 22;
 
     this.diasSemana.forEach((dia, index) => {
       const horariosDelDia = this.getHorariosForDay(dia.nombre);
@@ -516,14 +516,14 @@ export class ConsultaAsistenciasComponent implements OnInit {
 
     // Nota explicativa
     const pageHeight = doc.internal.pageSize.getHeight();
-    const finalY = (doc as any).lastAutoTable?.finalY || currentY;
+    const lastTableEndY = (doc as any).lastAutoTable?.finalY || currentY;
     
-    if (finalY < pageHeight - 40) {
+    if (lastTableEndY < pageHeight - 40) {
       doc.setFontSize(9);
       doc.setTextColor(100);
       doc.setFont('helvetica', 'italic');
-      doc.text('* Nota: El porcentaje de asistencia considera retardos con valor de 0.5 (50% de asistencia)', 20, finalY + 10);
-      doc.text('Fórmula: % = (Presentes + Retardos × 0.5) / Total × 100', 20, finalY + 16);
+      doc.text('* Nota: El porcentaje de asistencia considera retardos con valor de 0.5 (50% de asistencia)', 20, lastTableEndY + 10);
+      doc.text('Fórmula: % = (Presentes + Retardos × 0.5) / Total × 100', 20, lastTableEndY + 16);
     }
 
     // Pie de página con fecha de generación
