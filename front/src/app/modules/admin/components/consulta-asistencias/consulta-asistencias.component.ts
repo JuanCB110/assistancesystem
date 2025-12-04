@@ -556,28 +556,4 @@ export class ConsultaAsistenciasComponent implements OnInit {
     const valorPonderado = presentes + (retardos * 0.5);
     return `${Math.round((valorPonderado / total) * 100)}%`;
   }
-
-  getPorcentajeChecador(): string {
-    return this.calcularPorcentajeConRetardo(
-      this.weekStats.asistencias.checador,
-      this.weekStats.retardos.checador,
-      this.weekStats.total
-    );
-  }
-
-  getPorcentajeJefe(): string {
-    return this.calcularPorcentajeConRetardo(
-      this.weekStats.asistencias.jefe,
-      this.weekStats.retardos.jefe,
-      this.weekStats.total
-    );
-  }
-
-  getPorcentajeMaestro(): string {
-    return this.calcularPorcentajeConRetardo(
-      this.weekStats.asistencias.maestro,
-      this.weekStats.retardos.maestro,
-      this.weekStats.total
-    );
-  }
 }
