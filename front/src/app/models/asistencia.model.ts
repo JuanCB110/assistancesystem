@@ -31,6 +31,7 @@ export interface Asistencia {
   horario_id?: number;
   fecha?: string;
   asistencia?: 'Presente' | 'Falta' | 'Retardo';
+  tipo_asistencia?: string;
   estado?: 'presente' | 'ausente' | 'pendiente';
   created_at?: string;
 }
