@@ -61,6 +61,25 @@
   color: #721c24;
 }
 
+.pdf-button-container {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+}
+
+.pdf-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+}
+
+.pdf-button mat-icon {
+  margin-right: 4px;
+}
+
 .horario-header {
   background-color: #007bff;
   color: white;
@@ -132,10 +151,16 @@
   border: 1px solid #f5c6cb;
 }
 
+.estado.retardo {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
 .estado.sin-registro {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+  background-color: #e9ecef;
+  color: #495057;
+  border: 1px solid #dee2e6;
 }
 
 .empty-row {
