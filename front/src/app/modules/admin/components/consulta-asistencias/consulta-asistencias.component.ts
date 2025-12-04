@@ -156,13 +156,13 @@ export class ConsultaAsistenciasComponent implements OnInit {
 
       if (tipo === 'checador' || tipo === 'Checador') {
         if (estado === 'Presente') this.weekStats.asistencias.checador++;
-        else if (estado === 'Falta' || estado === 'Ausente') this.weekStats.faltas.checador++;
+        else if (estado === 'Falta') this.weekStats.faltas.checador++;
       } else if (tipo === 'jefe' || tipo === 'Jefe') {
         if (estado === 'Presente') this.weekStats.asistencias.jefe++;
-        else if (estado === 'Falta' || estado === 'Ausente') this.weekStats.faltas.jefe++;
+        else if (estado === 'Falta') this.weekStats.faltas.jefe++;
       } else if (tipo === 'maestro' || tipo === 'Maestro' || tipo === 'Profesor') {
         if (estado === 'Presente') this.weekStats.asistencias.maestro++;
-        else if (estado === 'Falta' || estado === 'Ausente') this.weekStats.faltas.maestro++;
+        else if (estado === 'Falta') this.weekStats.faltas.maestro++;
       }
     });
   }
@@ -204,8 +204,7 @@ export class ConsultaAsistenciasComponent implements OnInit {
   getEstadoText(estado?: string): string {
     switch (estado) {
       case 'Presente': return 'Presente';
-      case 'Falta':
-      case 'Ausente': return 'Falta';
+      case 'Falta': return 'Falta';
       case 'Retardo': return 'Retardo';
       default: return 'Sin registro';
     }
@@ -214,8 +213,7 @@ export class ConsultaAsistenciasComponent implements OnInit {
   getEstadoClass(estado?: string): string {
     switch (estado) {
       case 'Presente': return 'presente';
-      case 'Falta':
-      case 'Ausente': return 'ausente';
+      case 'Falta': return 'ausente';
       case 'Retardo': return 'retardo';
       default: return 'sin-registro';
     }
@@ -438,7 +436,7 @@ export class ConsultaAsistenciasComponent implements OnInit {
             4: { cellWidth: 25 },
             5: { cellWidth: 25 }
           },
-          didParseCell: (data) => {
+          didParseCell: (data: any) => {
             // Colorear las celdas según el estado
             if (data.section === 'body' && data.column.index >= 3) {
               const cellValue = data.cell.text[0];
