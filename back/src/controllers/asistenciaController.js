@@ -202,3 +202,45 @@ export const getResumenAsistencias = asyncHandler(async (req, res) => {
     }
   });
 });
+
+// GET /api/asistencias/maestro-semana?maestro_id=X&start_date=Y&end_date=Z
+export const getAsistenciasMaestroSemana = asyncHandler(async (req, res) => {
+  const { maestro_id, start_date, end_date } = req.query;
+
+  if (!maestro_id || !start_date || !end_date) {
+    return res.status(400).json({
+      success: false,
+      error: 'maestro_id, start_date y end_date son requeridos'
+    });
+  }
+
+  // Obtener horarios del maestro
+  const { data: horarios, error: horError } = await supabase
+    .from('horario_maestro')
+    .select('*')
+    .eq('maestro_id', maestro_id);
+
+  if (horError) throw horError;
+
+  const horariosIds = horarios.map(h => h.id);
+
+  if (horariosIds.length === 0) {
+    return res.json({ success: true, data: [] });
+  }
+
+  // Obtener asistencias de todas las fuentes en el rango de fechas
+  const [checador, jefe, maestro] = await Promise.all([
+    supabase.from('asistencia_checador').select('*').in('horario_id', horariosIds).gte('fecha', start_date).lte('fecha', end_date),
+    supabase.from('asistencia_jefe').select('*').in('horario_id', horariosIds).gte('fecha', start_date).lte('fecha', end_date),
+    supabase.from('asistencia_maestro').select('*').in('horario_id', horariosIds).gte('fecha', start_date).lte('fecha', end_date)
+  ]);
+
+  // Combinar todas las asistencias con el tipo
+  const todasAsistencias = [
+    ...(checador.data || []).map(a => ({ ...a, tipo_asistencia: 'checador' })),
+    ...(jefe.data || []).map(a => ({ ...a, tipo_asistencia: 'jefe' })),
+    ...(maestro.data || []).map(a => ({ ...a, tipo_asistencia: 'maestro' }))
+  ];
+
+  res.json({ success: true, data: todasAsistencias });
+});

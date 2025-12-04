@@ -8,7 +8,8 @@ import {
   updateAsistenciaJefe,
   getAsistenciasMaestro,
   createAsistenciaMaestro,
-  getResumenAsistencias
+  getResumenAsistencias,
+  getAsistenciasMaestroSemana
 } from '../controllers/asistenciaController.js';
 
 const router = express.Router();
@@ -26,6 +27,9 @@ router.put('/jefe/:id', updateAsistenciaJefe);
 // Rutas para asistencias de maestro
 router.get('/maestro', getAsistenciasMaestro);
 router.post('/maestro', createAsistenciaMaestro);
+
+// Ruta para obtener asistencias de maestro por semana
+router.get('/maestro-semana', getAsistenciasMaestroSemana);
 
 // Ruta para obtener resumen de asistencias
 router.get('/resumen/:maestro_id/:fecha', getResumenAsistencias);

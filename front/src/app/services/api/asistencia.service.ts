@@ -176,7 +176,7 @@ export class AsistenciaService {
 
   async getByMaestroAndWeek(maestroId: number, startDate: string, endDate: string): Promise<Asistencia[]> {
     try {
-      const response = await fetch(`${this.apiUrl}?maestro_id=${maestroId}&start_date=${startDate}&end_date=${endDate}`);
+      const response = await fetch(`${this.apiUrl}/maestro-semana?maestro_id=${maestroId}&start_date=${startDate}&end_date=${endDate}`);
       const result = await response.json();
       return result.data || [];
     } catch (error) {
