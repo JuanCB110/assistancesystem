@@ -46,12 +46,27 @@
         <strong>{{weekStats.asistencias.maestro}}</strong> (Profesor)
       </span>
     </div>
+    <div class="stat-item warning">
+      <span>Retardos: 
+        <strong>{{weekStats.retardos.checador}}</strong> (Checador) | 
+        <strong>{{weekStats.retardos.jefe}}</strong> (Jefe) | 
+        <strong>{{weekStats.retardos.maestro}}</strong> (Profesor)
+      </span>
+    </div>
     <div class="stat-item error">
       <span>Faltas: 
         <strong>{{weekStats.faltas.checador}}</strong> (Checador) | 
         <strong>{{weekStats.faltas.jefe}}</strong> (Jefe) | 
         <strong>{{weekStats.faltas.maestro}}</strong> (Profesor)
       </span>
+    </div>
+    <div class="stat-item info">
+      <span>% Asistencia*: 
+        <strong>{{getPorcentajeChecador()}}</strong> (Checador) | 
+        <strong>{{getPorcentajeJefe()}}</strong> (Jefe) | 
+        <strong>{{getPorcentajeMaestro()}}</strong> (Profesor)
+      </span>
+      <small class="porcentaje-nota">* Retardos cuentan como 50% de asistencia</small>
     </div>
   </div>
 

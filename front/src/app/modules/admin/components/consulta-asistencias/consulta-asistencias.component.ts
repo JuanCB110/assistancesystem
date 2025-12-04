@@ -74,6 +74,11 @@ export class ConsultaAsistenciasComponent implements OnInit {
       checador: 0,
       jefe: 0,
       maestro: 0
+    },
+    retardos: {
+      checador: 0,
+      jefe: 0,
+      maestro: 0
     }
   };
 
@@ -140,7 +145,8 @@ export class ConsultaAsistenciasComponent implements OnInit {
     this.weekStats = {
       total: 0,
       asistencias: { checador: 0, jefe: 0, maestro: 0 },
-      faltas: { checador: 0, jefe: 0, maestro: 0 }
+      faltas: { checador: 0, jefe: 0, maestro: 0 },
+      retardos: { checador: 0, jefe: 0, maestro: 0 }
     };
 
     // Contar horarios de la semana (Lunes a Viernes)
@@ -173,12 +179,15 @@ export class ConsultaAsistenciasComponent implements OnInit {
       if (tipo === 'checador' || tipo === 'Checador') {
         if (estado === 'Presente') this.weekStats.asistencias.checador++;
         else if (estado === 'Falta') this.weekStats.faltas.checador++;
+        else if (estado === 'Retardo') this.weekStats.retardos.checador++;
       } else if (tipo === 'jefe' || tipo === 'Jefe') {
         if (estado === 'Presente') this.weekStats.asistencias.jefe++;
         else if (estado === 'Falta') this.weekStats.faltas.jefe++;
+        else if (estado === 'Retardo') this.weekStats.retardos.jefe++;
       } else if (tipo === 'maestro' || tipo === 'Maestro' || tipo === 'Profesor') {
         if (estado === 'Presente') this.weekStats.asistencias.maestro++;
         else if (estado === 'Falta') this.weekStats.faltas.maestro++;
+        else if (estado === 'Retardo') this.weekStats.retardos.maestro++;
       }
     });
   }
@@ -408,11 +417,12 @@ export class ConsultaAsistenciasComponent implements OnInit {
       ['Concepto', 'Checador', 'Jefe de Grupo', 'Profesor'],
       ['Total de Clases', this.weekStats.total.toString(), this.weekStats.total.toString(), this.weekStats.total.toString()],
       ['Presentes', this.weekStats.asistencias.checador.toString(), this.weekStats.asistencias.jefe.toString(), this.weekStats.asistencias.maestro.toString()],
+      ['Retardos', this.weekStats.retardos.checador.toString(), this.weekStats.retardos.jefe.toString(), this.weekStats.retardos.maestro.toString()],
       ['Faltas', this.weekStats.faltas.checador.toString(), this.weekStats.faltas.jefe.toString(), this.weekStats.faltas.maestro.toString()],
-      ['% Asistencia', 
-        this.calcularPorcentaje(this.weekStats.asistencias.checador, this.weekStats.total),
-        this.calcularPorcentaje(this.weekStats.asistencias.jefe, this.weekStats.total),
-        this.calcularPorcentaje(this.weekStats.asistencias.maestro, this.weekStats.total)
+      ['% Asistencia*', 
+        this.calcularPorcentajeConRetardo(this.weekStats.asistencias.checador, this.weekStats.retardos.checador, this.weekStats.total),
+        this.calcularPorcentajeConRetardo(this.weekStats.asistencias.jefe, this.weekStats.retardos.jefe, this.weekStats.total),
+        this.calcularPorcentajeConRetardo(this.weekStats.asistencias.maestro, this.weekStats.retardos.maestro, this.weekStats.total)
       ]
     ];
 
@@ -504,6 +514,18 @@ export class ConsultaAsistenciasComponent implements OnInit {
       }
     });
 
+    // Nota explicativa
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const finalY = (doc as any).lastAutoTable?.finalY || currentY;
+    
+    if (finalY < pageHeight - 40) {
+      doc.setFontSize(9);
+      doc.setTextColor(100);
+      doc.setFont('helvetica', 'italic');
+      doc.text('* Nota: El porcentaje de asistencia considera retardos con valor de 0.5 (50% de asistencia)', 20, finalY + 10);
+      doc.text('Fórmula: % = (Presentes + Retardos × 0.5) / Total × 100', 20, finalY + 16);
+    }
+
     // Pie de página con fecha de generación
     const totalPages = (doc as any).internal.pages.length - 1;
     for (let i = 1; i <= totalPages; i++) {
@@ -526,5 +548,36 @@ export class ConsultaAsistenciasComponent implements OnInit {
   calcularPorcentaje(valor: number, total: number): string {
     if (total === 0) return '0%';
     return `${Math.round((valor / total) * 100)}%`;
+  }
+
+  calcularPorcentajeConRetardo(presentes: number, retardos: number, total: number): string {
+    if (total === 0) return '0%';
+    // Retardo cuenta como 0.5 de asistencia
+    const valorPonderado = presentes + (retardos * 0.5);
+    return `${Math.round((valorPonderado / total) * 100)}%`;
+  }
+
+  getPorcentajeChecador(): string {
+    return this.calcularPorcentajeConRetardo(
+      this.weekStats.asistencias.checador,
+      this.weekStats.retardos.checador,
+      this.weekStats.total
+    );
+  }
+
+  getPorcentajeJefe(): string {
+    return this.calcularPorcentajeConRetardo(
+      this.weekStats.asistencias.jefe,
+      this.weekStats.retardos.jefe,
+      this.weekStats.total
+    );
+  }
+
+  getPorcentajeMaestro(): string {
+    return this.calcularPorcentajeConRetardo(
+      this.weekStats.asistencias.maestro,
+      this.weekStats.retardos.maestro,
+      this.weekStats.total
+    );
   }
 }
